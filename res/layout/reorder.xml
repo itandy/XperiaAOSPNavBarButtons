@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.commonsware.cwac.tlv.TouchListView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tlv="http://schemas.android.com/apk/res/com.gzplanet.xposed.xperianavbarbuttons"
+    android:id="@android:id/list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:drawSelectorOnTop="false"
+    tlv:expanded_height="128dip"
+    tlv:grabber="@+id/icon"
+    tlv:normal_height="64dip"
+    tlv:remove_mode="slideRight" />
