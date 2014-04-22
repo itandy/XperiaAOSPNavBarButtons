@@ -36,6 +36,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 	Context mContext;
 	XModuleResources modRes;
 	private static XSharedPreferences pref;
+	int mDisabledFlags;
 
 	@Override
 	public void initZygote(StartupParam startupParam) throws Throwable {
@@ -214,7 +215,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							final int disabledFlags = (Integer) param.args[0];
 							final boolean force = (Boolean) param.args[1];
 
-							final int mDisabledFlags = XposedHelpers.getIntField(param.thisObject, "mDisabledFlags");
+							// keep original value for afterHookedMethod
+							mDisabledFlags = XposedHelpers.getIntField(param.thisObject, "mDisabledFlags");
 							final View mCurrentView = (View) XposedHelpers.getObjectField(param.thisObject, "mCurrentView");
 
 							final View searchButton = mCurrentView.findViewWithTag("search");
@@ -230,7 +232,24 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							if (menuButton != null)
 								menuButton.setVisibility(disableHome ? View.INVISIBLE : View.VISIBLE);
 						}
-					});
+
+						@Override
+						protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+							final int disabledFlags = (Integer) param.args[0];
+							final boolean force = (Boolean) param.args[1];
+
+							final View mCurrentView = (View) XposedHelpers.getObjectField(param.thisObject, "mCurrentView");
+							final View recentButton = mCurrentView.findViewById(mCurrentView.getResources().getIdentifier("recent_apps", "id", CLASSNAME_SYSTEMUI));
+
+							if (!force && mDisabledFlags == disabledFlags)
+								return;
+
+							final boolean disableRecent = ((disabledFlags & View.STATUS_BAR_DISABLE_RECENT) != 0);
+							
+							if (recentButton != null)
+								recentButton.setVisibility(disableRecent ? View.INVISIBLE : View.VISIBLE);
+						}
+				});
 		} catch (NoSuchMethodError e2) {
 			XposedBridge.log("setDisabledFlags not found");
 			return;
