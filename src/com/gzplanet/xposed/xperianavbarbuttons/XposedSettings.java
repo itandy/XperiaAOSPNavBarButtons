@@ -27,10 +27,12 @@ public class XposedSettings extends PreferenceActivity {
 
 	int mScreenWidth;
 	int mButtonWidth;
-	int mButtonsCount = 3;
+	int mButtonsCount = 2;
 	boolean mShowMenu;
 	boolean mShowSearch;
+	boolean mShowRecent;
 
+	CheckBoxPreference mPrefShowRecent;
 	CheckBoxPreference mPrefShowMenu;
 	CheckBoxPreference mPrefShowSearch;
 	Preference mPrefRestartSystemUI;
@@ -62,6 +64,9 @@ public class XposedSettings extends PreferenceActivity {
 		mShowSearch = mSettings.isShowSearch();
 		if (mShowSearch)
 			mButtonsCount++;
+		mShowRecent = mSettings.isShowRecent();
+		if (mShowRecent)
+			mButtonsCount++;
 
 		updatePreviewPanel();
 
@@ -70,6 +75,22 @@ public class XposedSettings extends PreferenceActivity {
 		// are in the same package, they are executed in the context of the
 		// hooked package
 		getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
+
+		mPrefShowRecent = (CheckBoxPreference) findPreference("pref_show_recent");
+		mPrefShowRecent.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				if ((Boolean) newValue)
+					mButtonsCount++;
+				else
+					mButtonsCount--;
+				mShowRecent = (Boolean) newValue;
+				mSettings.setShowRecent(mShowRecent);
+				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				updatePreviewPanel();
+				return true;
+			}
+		});
 
 		mPrefShowMenu = (CheckBoxPreference) findPreference("pref_show_menu");
 		mPrefShowMenu.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {

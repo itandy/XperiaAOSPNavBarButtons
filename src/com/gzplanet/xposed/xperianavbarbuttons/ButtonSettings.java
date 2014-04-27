@@ -9,8 +9,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
 public class ButtonSettings {
-	private final static String CLASSNAME_SYSTEMUI = "com.android.systemui";
-
 	private Drawable mImgHomeButton;
 	private Drawable mImgBackButton;
 	private Drawable mImgRecentButton;
@@ -19,17 +17,18 @@ public class ButtonSettings {
 
 	private boolean mShowMenu = false;
 	private boolean mShowSearch = false;
+	private boolean mShowRecent = false;
 	private ArrayList<String> mOrder = new ArrayList<String>();
 
 	public ButtonSettings(Context context, String orderList) {
 		// prepare preview panel
 		PackageManager pm = context.getPackageManager();
 		try {
-			Resources resSystemUI = pm.getResourcesForApplication(CLASSNAME_SYSTEMUI);
-			mImgHomeButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_home", "drawable", CLASSNAME_SYSTEMUI));
-			mImgBackButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_back", "drawable", CLASSNAME_SYSTEMUI));
-			mImgRecentButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_recent", "drawable", CLASSNAME_SYSTEMUI));
-			mImgMenuButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_menu", "drawable", CLASSNAME_SYSTEMUI));
+			Resources resSystemUI = pm.getResourcesForApplication(XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
+			mImgHomeButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_home", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
+			mImgBackButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_back", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
+			mImgRecentButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_recent", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
+			mImgMenuButton = resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_menu", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
 			mImgSearchButton = context.getResources().getDrawable(R.drawable.ic_sysbar_search);
 		} catch (NameNotFoundException e1) {
 			e1.printStackTrace();
@@ -52,8 +51,22 @@ public class ButtonSettings {
 					mShowMenu = true;
 				if ("Search".equals(array[i]))
 					mShowSearch = true;
+				if ("Recent".equals(array[i]))
+					mShowRecent = true;
 			}
 		}
+	}
+
+	public boolean isShowRecent() {
+		return mShowRecent;
+	}
+
+	public void setShowRecent(boolean showRecent) {
+		mShowRecent = showRecent;
+		if (mShowRecent)
+			addButton("Recent");
+		else
+			removeButton("Recent");
 	}
 
 	public boolean isShowMenu() {
