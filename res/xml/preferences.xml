@@ -3,6 +3,11 @@
 
     <CheckBoxPreference
         android:defaultValue="true"
+        android:key="pref_show_recent"
+        android:summary="Show recent apps button"
+        android:title="Show Recent" />
+    <CheckBoxPreference
+        android:defaultValue="true"
         android:key="pref_show_menu"
         android:summary="Show menu button"
         android:title="Show Menu" />
