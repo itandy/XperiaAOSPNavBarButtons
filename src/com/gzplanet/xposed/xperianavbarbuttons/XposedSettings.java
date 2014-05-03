@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.CheckBoxPreference;
@@ -16,9 +16,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -31,14 +29,21 @@ public class XposedSettings extends PreferenceActivity {
 	boolean mShowMenu;
 	boolean mShowSearch;
 	boolean mShowRecent;
+	String mThemeId;
+	String mThemeColor;
+	boolean mUseTheme;
+	boolean mUseAltMenu;
 
 	CheckBoxPreference mPrefShowRecent;
 	CheckBoxPreference mPrefShowMenu;
 	CheckBoxPreference mPrefShowSearch;
 	Preference mPrefRestartSystemUI;
 	Preference mPrefReorder;
+	Preference mPrefTheme;
+	CheckBoxPreference mPrefUseAltMenu;
 
 	ButtonSettings mSettings;
+	ThemeIcons mThemeIcons = new ThemeIcons();
 
 	static int[] mIconId = { R.id.iv1, R.id.iv2, R.id.iv3, R.id.iv4, R.id.iv5 };
 
@@ -50,13 +55,17 @@ public class XposedSettings extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.preferences);
 
 		// get screen width
-		final Display defaultDisplay = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-		final Point point = new Point();
-		defaultDisplay.getSize(point);
-		mScreenWidth = point.x;
+		mScreenWidth = Utils.getScreenWidth(this);
 
-		String order = getPreferenceManager().getSharedPreferences().getString("pref_order", null);
-		mSettings = new ButtonSettings(this, order);
+		mPrefShowRecent = (CheckBoxPreference) findPreference("pref_show_recent");
+		mPrefShowMenu = (CheckBoxPreference) findPreference("pref_show_menu");
+		mPrefShowSearch = (CheckBoxPreference) findPreference("pref_show_search");
+		mPrefReorder = (Preference) findPreference("pref_reorder");
+		mPrefTheme = (Preference) findPreference("pref_theme");
+		mPrefRestartSystemUI = (Preference) findPreference("pref_restart_systemui");
+		mPrefUseAltMenu = (CheckBoxPreference) findPreference("pref_use_alt_menu");
+
+		reloadPreferences();
 
 		mShowMenu = mSettings.isShowMenu();
 		if (mShowMenu)
@@ -76,7 +85,6 @@ public class XposedSettings extends PreferenceActivity {
 		// hooked package
 		getPreferenceManager().setSharedPreferencesMode(MODE_WORLD_READABLE);
 
-		mPrefShowRecent = (CheckBoxPreference) findPreference("pref_show_recent");
 		mPrefShowRecent.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -92,7 +100,6 @@ public class XposedSettings extends PreferenceActivity {
 			}
 		});
 
-		mPrefShowMenu = (CheckBoxPreference) findPreference("pref_show_menu");
 		mPrefShowMenu.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -108,7 +115,6 @@ public class XposedSettings extends PreferenceActivity {
 			}
 		});
 
-		mPrefShowSearch = (CheckBoxPreference) findPreference("pref_show_search");
 		mPrefShowSearch.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -124,8 +130,6 @@ public class XposedSettings extends PreferenceActivity {
 			}
 		});
 
-		mPrefReorder = (Preference) findPreference("pref_reorder");
-
 		mPrefReorder.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
@@ -136,7 +140,27 @@ public class XposedSettings extends PreferenceActivity {
 			}
 		});
 
-		mPrefRestartSystemUI = (Preference) findPreference("pref_restart_systemui");
+		mPrefTheme.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				Intent intent = new Intent(XposedSettings.this, ThemeActivity.class);
+				intent.putExtra("usetheme", mUseTheme);
+				intent.putExtra("themeid", mThemeId);
+				intent.putExtra("themecolor", mThemeColor);
+				startActivityForResult(intent, 2);
+				return true;
+			}
+		});
+
+		mPrefUseAltMenu.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				mUseAltMenu = (Boolean) newValue;
+				getPreferenceManager().getSharedPreferences().edit().putBoolean("pref_use_alt_menu", mUseAltMenu).commit();
+				updatePreviewPanel();
+				return true;
+			}
+		});
 
 		mPrefRestartSystemUI.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			@Override
@@ -178,32 +202,68 @@ public class XposedSettings extends PreferenceActivity {
 				return true;
 			}
 		});
+
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
-			String settings = data.getStringExtra("order_list");
-			getPreferenceManager().getSharedPreferences().edit().putString("pref_order", settings).commit();
-			mSettings = new ButtonSettings(this, settings);
-			updatePreviewPanel();
+			switch (requestCode) {
+			case 1:
+				String order = data.getStringExtra("order_list");
+				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", order).commit();
+				mSettings = new ButtonSettings(this, order);
+				updatePreviewPanel();
+				break;
+			case 2:
+				mUseTheme = data.getBooleanExtra("usetheme", false);
+				mThemeId = data.getStringExtra("themeid");
+				mThemeColor = data.getStringExtra("themecolor");
+				Editor editor = getPreferenceManager().getSharedPreferences().edit();
+				editor.putBoolean("pref_usetheme", mUseTheme);
+				editor.putString("pref_themeid", mThemeId);
+				editor.putString("pref_themecolor", mThemeColor);
+				editor.commit();
+				updatePreviewPanel();
+				break;
+			}
 		}
+
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
-	void updatePreviewPanel() {
+	private void updatePreviewPanel() {
 		mButtonWidth = Math.round((float) mScreenWidth / (float) mButtonsCount);
 
 		LinearLayout panel = (LinearLayout) findViewById(R.id.previewPanel);
 		for (int i = 0; i < 5; i++) {
 			ImageView iv = (ImageView) panel.findViewById(mIconId[i]);
 			if (i < mButtonsCount) {
+				boolean useAlt = false;
+
 				iv.setLayoutParams(new LinearLayout.LayoutParams(mButtonWidth, LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
-				iv.setImageDrawable(mSettings.getButtonDrawable(i));
+				if ("Menu".equals(mSettings.getButtonName(i)))
+					useAlt = mUseAltMenu;
+				iv.setImageDrawable(mUseTheme ? getResources().getDrawable(
+						mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i), useAlt, false)) : mSettings.getButtonDrawable(i));
 				iv.setVisibility(View.VISIBLE);
 			} else {
 				iv.setVisibility(View.GONE);
 			}
 		}
+
+		mPrefUseAltMenu.setEnabled(mUseTheme);
+	}
+
+	private void reloadPreferences() {
+		SharedPreferences pref = getPreferenceManager().getSharedPreferences();
+
+		mThemeId = pref.getString("pref_themeid", XperiaNavBarButtons.DEF_THEMEID);
+		mThemeColor = pref.getString("pref_themecolor", XperiaNavBarButtons.DEF_THEMECOLOR);
+
+		mSettings = new ButtonSettings(this, pref.getString("pref_order", null));
+
+		mUseTheme = pref.getBoolean("pref_usetheme", false);
+		mUseAltMenu = pref.getBoolean("pref_use_alt_menu", false);
 	}
 }

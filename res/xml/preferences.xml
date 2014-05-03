@@ -16,13 +16,25 @@
         android:key="pref_show_search"
         android:summary="Show search button"
         android:title="Show Search" />
-    <Preference 
-        android:title="Re-order buttons"
+
+    <Preference
+        android:key="pref_reorder"
         android:summary="Re-order buttons in NavBar"
-        android:key="pref_reorder"/>
-    <Preference 
-        android:title="Restart SystemUI (Root required)"
+        android:title="Re-order buttons" />
+    <Preference
+        android:key="pref_theme"
+        android:summary="Select theme for NavBar buttons"
+        android:title="Select theme" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_use_alt_menu"
+        android:summary="Only available when theme is selected"
+        android:title="Use alternate menu button" />
+
+    <Preference
+        android:key="pref_restart_systemui"
         android:summary="Restart SysmteUI process to apply changes immediately.\n\nIf notification bar or NavBar are not displaying correctly or any icons are missing, please reboot your device."
-        android:key="pref_restart_systemui"/>
+        android:title="Restart SystemUI (Root required)" />
 
 </PreferenceScreen>

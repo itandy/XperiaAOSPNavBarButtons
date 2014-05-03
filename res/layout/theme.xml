@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/theme_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Switch
+        android:id="@+id/use_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/theme_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/use_theme"
+        android:layout_margin="5dp"
+        android:background="#ff303030"
+        android:gravity="center_horizontal"
+        android:padding="5dp"
+        android:text="@string/available_themes"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/theme_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/example_label"
+        android:layout_below="@id/theme_label"
+        android:drawSelectorOnTop="true" />
+
+    <TextView
+        android:id="@id/example_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/theme_example"
+        android:layout_margin="5dp"
+        android:background="#ff303030"
+        android:gravity="center_horizontal"
+        android:padding="5dp"
+        android:text="@string/selected_theme"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@id/theme_example"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/color_Label"
+        android:scaleType="center" />
+
+    <TextView
+        android:id="@id/color_Label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/color_panel"
+        android:layout_margin="5dp"
+        android:background="#ff303030"
+        android:gravity="center_horizontal"
+        android:padding="5dp"
+        android:text="@string/available_colors"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@id/color_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,5 +1,9 @@
 <resources>
 
     <string name="app_name">Xperia/AOSP NavBar Buttons</string>
-	<string name="navbar_preview">NavBar Preview</string>
+    <string name="navbar_preview">NavBar Preview</string>
+    <string name="available_themes">Available themes</string>
+    <string name="selected_theme">Selected theme</string>
+    <string name="available_colors">Available colors</string>
+
 </resources>

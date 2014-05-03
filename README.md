@@ -1,7 +1,7 @@
 Xperia/AOSP NavBar Buttons
 ===================================
 
-This Xposed module allows you to change the NavBar buttons on your Xperia/AOSP devices. On stock ROM, there're only three buttons on the NavBar (Back, Home and Recent Apps). Now you can add the Menu and Search buttons as well.
+This Xposed module allows you to change the NavBar buttons on your Xperia/AOSP devices. On stock ROM, there're only three buttons on the NavBar (Back, Home and Recent Apps). Now you can have complete control of the buttons and how they look like.
 
 Installation instructions:
 1. Install the module
