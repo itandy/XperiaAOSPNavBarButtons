@@ -95,7 +95,8 @@ public class XposedSettings extends PreferenceActivity {
 					mButtonsCount--;
 				mShowRecent = (Boolean) newValue;
 				mSettings.setShowRecent(mShowRecent);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -110,7 +111,8 @@ public class XposedSettings extends PreferenceActivity {
 					mButtonsCount--;
 				mShowMenu = (Boolean) newValue;
 				mSettings.setShowMenu(mShowMenu);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -125,7 +127,8 @@ public class XposedSettings extends PreferenceActivity {
 					mButtonsCount--;
 				mShowSearch = (Boolean) newValue;
 				mSettings.setShowSearch(mShowSearch);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -157,7 +160,8 @@ public class XposedSettings extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				mUseAltMenu = (Boolean) newValue;
-				getPreferenceManager().getSharedPreferences().edit().putBoolean("pref_use_alt_menu", mUseAltMenu).commit();
+				getPreferenceManager().getSharedPreferences().edit().putBoolean("pref_use_alt_menu", mUseAltMenu)
+						.commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -171,7 +175,8 @@ public class XposedSettings extends PreferenceActivity {
 
 					final String pkgName = XposedSettings.this.getPackageName();
 					final String pkgFilename = pkgName + "_preferences";
-					final File prefFile = new File(Environment.getDataDirectory(), "data/" + pkgName + "/shared_prefs/" + pkgFilename + ".xml");
+					final File prefFile = new File(Environment.getDataDirectory(), "data/" + pkgName + "/shared_prefs/"
+							+ pkgFilename + ".xml");
 					Log.d("XposedSettings", prefFile.getAbsolutePath());
 
 					// make shared preference world-readable
@@ -236,17 +241,24 @@ public class XposedSettings extends PreferenceActivity {
 	private void updatePreviewPanel() {
 		mButtonWidth = Math.round((float) mScreenWidth / (float) mButtonsCount);
 
+		// get default navbar height
+		int resId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+
 		LinearLayout panel = (LinearLayout) findViewById(R.id.previewPanel);
+		if (resId > 0)
+			panel.getLayoutParams().height = getResources().getDimensionPixelSize(resId);
 		for (int i = 0; i < 5; i++) {
 			ImageView iv = (ImageView) panel.findViewById(mIconId[i]);
 			if (i < mButtonsCount) {
 				boolean useAlt = false;
 
-				iv.setLayoutParams(new LinearLayout.LayoutParams(mButtonWidth, LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
+				iv.setLayoutParams(new LinearLayout.LayoutParams(mButtonWidth, LinearLayout.LayoutParams.FILL_PARENT,
+						0.0f));
 				if ("Menu".equals(mSettings.getButtonName(i)))
 					useAlt = mUseAltMenu;
 				iv.setImageDrawable(mUseTheme ? getResources().getDrawable(
-						mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i), useAlt, false)) : mSettings.getButtonDrawable(i));
+						mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i), useAlt, false))
+						: mSettings.getButtonDrawable(i));
 				iv.setVisibility(View.VISIBLE);
 			} else {
 				iv.setVisibility(View.GONE);
