@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    { 
+          color:#C0F0C0; 
+          font-size:1.2em; 
+          font-weight:bold; 
+          margin-top:1em; 
+          margin-bottom:0.5em }
+      div.subtitle { 
+          color:#C0F0C0; 
+          font-size:0.8em; 
+          margin-bottom:1em }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+$ 3.0
+  % Version 3.0
+  _ New option to user define button images
+  	!<B>Instructions to use user define button image:</B>
+    #Prepare your own buttons images in PNG format. Name the files using the following format. You don't need to prepare all of them. Stock image will be used if a user define version is not found.
+    #Copy the files into your <B>internal sd storage</B>. Any folder under the internal sd storage is fine. Very often, you can access this using the path /sdcard/.
+    #In Select theme screen, there's now a new theme called <B>User define</B>
+    #If this is the first time you select User define, then you should see a list of folders in your internal sd storage. Otherwise, you should see a new button called <B>Import button images</B>
+    #Navigate to the folder where you've stored the images
+    #If successfully detected, it should shows the number of image files found
+    #Tap Confirm button
+    #The module will copy the files into it's own cache folder so your copy can safely be deleted now
+    #Restart SystemUI or reboot to take effect
+	<BR>     
+  	!<B>Image filename format:</B>
+  	*ic_sysbar_back.png - Back button (portrait)
+  	*ic_sysbar_back_land.png - Back button (landscape)
+  	*ic_sysbar_back_ime.png - Back button (portrait and when keyboard is shown)
+  	*ic_sysbar_back_ime_land.png - Back button (landscape and when keyboard is shown)
+  	*ic_sysbar_home.png - Home button (portrait)
+  	*ic_sysbar_home_land.png - Home button (landscape)
+  	*ic_sysbar_menu.png - Menu button (portrait)
+  	*ic_sysbar_menu_land.png - Menu button (landscape)
+  	*ic_sysbar_menu_alt.png - Menu button (portrait and alternate)
+  	*ic_sysbar_menu_alt_land.png - Menu button (landscape and alternate)
+  	*ic_sysbar_recent.png - Recent button (portrait)
+  	*ic_sysbar_recent_land.png - Recent button (landscape)
+  	*ic_sysbar_search.png - Search button (portrait)
+  	*ic_sysbar_search_land.png - Search button (landscape)
+
+$ END_OF_CHANGE_LOG
+  </body>
+</html>

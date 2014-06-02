@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import sheetrock.panda.changelog.ChangeLog;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.CheckBoxPreference;
@@ -18,7 +22,6 @@ import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -34,6 +37,8 @@ public class XposedSettings extends PreferenceActivity {
 	String mThemeColor;
 	boolean mUseTheme;
 	boolean mUseAltMenu;
+	String mCacheFolder;
+	int mDensityDpi;
 
 	CheckBoxPreference mPrefShowRecent;
 	CheckBoxPreference mPrefShowMenu;
@@ -42,9 +47,11 @@ public class XposedSettings extends PreferenceActivity {
 	Preference mPrefReorder;
 	Preference mPrefTheme;
 	CheckBoxPreference mPrefUseAltMenu;
+	Preference mPrefHints;
 
 	ButtonSettings mSettings;
 	ThemeIcons mThemeIcons = new ThemeIcons();
+	CustomButtons mCustomButtons;
 
 	static int[] mIconId = { R.id.iv1, R.id.iv2, R.id.iv3, R.id.iv4, R.id.iv5 };
 
@@ -65,6 +72,7 @@ public class XposedSettings extends PreferenceActivity {
 		mPrefTheme = (Preference) findPreference("pref_theme");
 		mPrefRestartSystemUI = (Preference) findPreference("pref_restart_systemui");
 		mPrefUseAltMenu = (CheckBoxPreference) findPreference("pref_use_alt_menu");
+		mPrefHints = (Preference) findPreference("pref_hints");
 
 		reloadPreferences();
 
@@ -77,6 +85,12 @@ public class XposedSettings extends PreferenceActivity {
 		mShowRecent = mSettings.isShowRecent();
 		if (mShowRecent)
 			mButtonsCount++;
+
+		mCacheFolder = Utils.getSystemUICacheFolder(this);
+		mDensityDpi = Utils.getDensityDpi(getResources());
+		mCustomButtons = new CustomButtons(mCacheFolder, mDensityDpi, "custom_");
+
+		storePreferences();
 
 		updatePreviewPanel();
 
@@ -209,6 +223,18 @@ public class XposedSettings extends PreferenceActivity {
 			}
 		});
 
+		mPrefHints.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				(new ChangeLog(XposedSettings.this)).getFullLogDialog().show();
+				return true;
+			}
+		});
+
+		// display change log
+		ChangeLog cl = new ChangeLog(this);
+		if (cl.firstRun())
+	        cl.getFullLogDialog().show();
 	}
 
 	@Override
@@ -230,6 +256,7 @@ public class XposedSettings extends PreferenceActivity {
 				editor.putString("pref_themeid", mThemeId);
 				editor.putString("pref_themecolor", mThemeColor);
 				editor.commit();
+				mCustomButtons.refresh();
 				updatePreviewPanel();
 				break;
 			}
@@ -242,11 +269,11 @@ public class XposedSettings extends PreferenceActivity {
 		mButtonWidth = Math.round((float) mScreenWidth / (float) mButtonsCount);
 
 		// get default navbar height
-		int resId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+		int navBarHeight = Utils.getNavBarHeight(getResources());
 
 		LinearLayout panel = (LinearLayout) findViewById(R.id.previewPanel);
-		if (resId > 0)
-			panel.getLayoutParams().height = getResources().getDimensionPixelSize(resId);
+		if (navBarHeight > 0)
+			panel.getLayoutParams().height = navBarHeight;
 		for (int i = 0; i < 5; i++) {
 			ImageView iv = (ImageView) panel.findViewById(mIconId[i]);
 			if (i < mButtonsCount) {
@@ -256,9 +283,24 @@ public class XposedSettings extends PreferenceActivity {
 						0.0f));
 				if ("Menu".equals(mSettings.getButtonName(i)))
 					useAlt = mUseAltMenu;
-				iv.setImageDrawable(mUseTheme ? getResources().getDrawable(
-						mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i), useAlt, false))
-						: mSettings.getButtonDrawable(i));
+
+				Drawable drawable = null;
+				if (mUseTheme) {
+					int buttonResId = mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i),
+							useAlt, false);
+					if (buttonResId != -1)
+						drawable = getResources().getDrawable(buttonResId);
+					else {
+						Bitmap bitmap = mCustomButtons.getBitmap(mSettings.getButtonName(i), useAlt, false);
+						if (bitmap == null)
+							drawable = mSettings.getButtonDrawable(i);
+						else
+							drawable = new BitmapDrawable(getResources(), bitmap);
+					}
+				} else {
+					drawable = mSettings.getButtonDrawable(i);
+				}
+				iv.setImageDrawable(drawable);
 				iv.setVisibility(View.VISIBLE);
 			} else {
 				iv.setVisibility(View.GONE);
@@ -278,5 +320,14 @@ public class XposedSettings extends PreferenceActivity {
 
 		mUseTheme = pref.getBoolean("pref_usetheme", false);
 		mUseAltMenu = pref.getBoolean("pref_use_alt_menu", false);
+	}
+
+	// store necesary info for user define theme to work
+	private void storePreferences() {
+		Editor editor = getPreferenceManager().getSharedPreferences().edit();
+
+		editor.putString("pref_cache_folder", mCacheFolder);
+		editor.putInt("pref_density_dpi", mDensityDpi);
+		editor.commit();
 	}
 }

@@ -5,5 +5,11 @@
     <string name="available_themes">Available themes</string>
     <string name="selected_theme">Selected theme</string>
     <string name="available_colors">Available colors</string>
-
+	<string name="confirm">Confirm</string>
+	<string name="import_button_iamges">Import button images</string>
+	
+	<string name="changelog_full_title">Change Log</string>
+    <string name="changelog_title">What\'s New</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">more</string>
 </resources>

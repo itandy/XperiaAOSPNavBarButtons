@@ -85,56 +85,6 @@ public class ThemeIcons {
 	private class IconSet {
 		private Map<ButtonAttr, Integer> mButtonRes = new HashMap<ButtonAttr, Integer>();
 
-		private class ButtonAttr {
-			private String mType;
-			private boolean mIsAlt;
-			private boolean mLandscape;
-
-			public ButtonAttr(String type, boolean isAlt, boolean landscape) {
-				mType = type;
-				mIsAlt = isAlt;
-				mLandscape = landscape;
-			}
-
-			@Override
-			public int hashCode() {
-				final int prime = 31;
-				int result = 1;
-				result = prime * result + getOuterType().hashCode();
-				result = prime * result + (mIsAlt ? 1231 : 1237);
-				result = prime * result + (mLandscape ? 1231 : 1237);
-				result = prime * result + ((mType == null) ? 0 : mType.hashCode());
-				return result;
-			}
-
-			@Override
-			public boolean equals(Object obj) {
-				if (this == obj)
-					return true;
-				if (obj == null)
-					return false;
-				if (!(obj instanceof ButtonAttr))
-					return false;
-				ButtonAttr other = (ButtonAttr) obj;
-				if (!getOuterType().equals(other.getOuterType()))
-					return false;
-				if (mIsAlt != other.mIsAlt)
-					return false;
-				if (mLandscape != other.mLandscape)
-					return false;
-				if (mType == null) {
-					if (other.mType != null)
-						return false;
-				} else if (!mType.equals(other.mType))
-					return false;
-				return true;
-			}
-
-			private IconSet getOuterType() {
-				return IconSet.this;
-			}
-
-		}
 
 		public IconSet(String themeId, String color, int back, int backIme, int backLand, int backImeLand, int home, int homeLand, int menu, int menuLand,
 				int menuBig, int menuBigLand, int recent, int recentLand, int search, int searchLand) {
@@ -398,6 +348,8 @@ public class ThemeIcons {
 				R.drawable.ztegrandblue_ic_sysbar_menu, R.drawable.ztegrandblue_ic_sysbar_menu_land, R.drawable.ztegrandblue_ic_sysbar_recent,
 				R.drawable.ztegrandblue_ic_sysbar_recent_land, R.drawable.ztegrandblue_ic_sysbar_search, R.drawable.ztegrandblue_ic_sysbar_search_land);
 
+		add("User define", "N/A", -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+
 		// fill up color map
 		mColorMap.put("White", -1);
 		mColorMap.put("Blue", -16730123);
@@ -406,6 +358,7 @@ public class ThemeIcons {
 		mColorMap.put("Purple", -7864165);
 		mColorMap.put("Red", -63480);
 		mColorMap.put("Yellow", -4341);
+		mColorMap.put("N/A", 0);
 	}
 
 	private void add(String themeId, String color, int example, int back, int backIme, int backLand, int backImeLand, int home, int homeLand, int menu,

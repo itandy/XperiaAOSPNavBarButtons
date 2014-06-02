@@ -1,5 +1,6 @@
 package com.gzplanet.xposed.xperianavbarbuttons;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,11 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 
 public class ButtonSettings {
 	private boolean mShowMenu = false;
@@ -20,17 +25,27 @@ public class ButtonSettings {
 	public ButtonSettings(Context context, String orderList) {
 		// prepare preview panel
 		PackageManager pm = context.getPackageManager();
+		String cacheFolder = null;
+		try {
+			cacheFolder = context.getExternalCacheDir().getAbsolutePath()
+					.replace(context.getPackageName(), XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
+		} catch (Exception e) {
+		}
+
 		try {
 			Resources resSystemUI = pm.getResourcesForApplication(XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
 
-			mStockButtons.put("Home", resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_home", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI)));
-			mStockButtons.put("Back", resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_back", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI)));
-			mStockButtons.put("Recent",
-					resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_recent", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI)));
-			mStockButtons.put("Menu", resSystemUI.getDrawable(resSystemUI.getIdentifier("ic_sysbar_menu", "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI)));
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			DisplayMetrics metrics = resSystemUI.getDisplayMetrics();
+			options.inDensity = 240;
+			options.inTargetDensity = metrics.densityDpi;
+
+			mStockButtons.put("Home", getStockButtonDrawable(resSystemUI, "ic_sysbar_home", cacheFolder, options));
+			mStockButtons.put("Back", getStockButtonDrawable(resSystemUI, "ic_sysbar_back", cacheFolder, options));
+			mStockButtons.put("Recent", getStockButtonDrawable(resSystemUI, "ic_sysbar_recent", cacheFolder, options));
+			mStockButtons.put("Menu", getStockButtonDrawable(resSystemUI, "ic_sysbar_menu", cacheFolder, options));
 			mStockButtons.put("Search", context.getResources().getDrawable(R.drawable.ic_sysbar_search));
 		} catch (NameNotFoundException e1) {
-			e1.printStackTrace();
 		}
 
 		if (orderList == null) {
@@ -123,11 +138,31 @@ public class ButtonSettings {
 
 		return mStockButtons.get(mOrder.get(index));
 	}
-	
+
 	public String getButtonName(int index) {
 		if (index >= mOrder.size())
 			return null;
-		
+
 		return mOrder.get(index);
+	}
+
+	/*
+	 * get stock button drawable either from 1. cache folder 2. SystemUI
+	 * resources
+	 */
+	private Drawable getStockButtonDrawable(Resources res, String resName, String cacheFolder,
+			BitmapFactory.Options options) {
+
+		if (cacheFolder != null) {
+			Bitmap bitmap = BitmapFactory.decodeFile(cacheFolder + File.separator + resName + ".png", options);
+			if (bitmap != null) {
+				Drawable drawable = new BitmapDrawable(res, bitmap);
+
+				if (drawable.getIntrinsicHeight() > 0 && drawable.getIntrinsicWidth() > 0)
+					return drawable;
+			}
+		}
+
+		return res.getDrawable(res.getIdentifier(resName, "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
 	}
 }

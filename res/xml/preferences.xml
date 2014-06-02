@@ -37,4 +37,9 @@
         android:summary="Restart SysmteUI process to apply changes immediately.\n\nIf notification bar or NavBar are not displaying correctly or any icons are missing, please reboot your device."
         android:title="Restart SystemUI (Root required)" />
 
+    <Preference
+        android:key="pref_hints"
+        android:summary="How to use user define button images"
+        android:title="Hints" />
+
 </PreferenceScreen>

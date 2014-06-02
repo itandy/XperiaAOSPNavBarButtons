@@ -1,11 +1,16 @@
 package com.gzplanet.xposed.xperianavbarbuttons;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.res.XModuleResources;
+import android.content.res.XResources;
+import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.Display;
 import android.view.Gravity;
@@ -41,9 +46,15 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 	Context mContext;
 	int mDisabledFlags;
+	String mCacheFolder;
+	int mDensityDpi;
+	CustomButtons mCustomButtons;
 	ThemeIcons mThemeIcons;
 	XModuleResources modRes;
-	private static XSharedPreferences pref;
+
+	static XSharedPreferences pref;
+
+	Map<String, Bitmap> mStockButtons = new HashMap<String, Bitmap>();
 
 	@Override
 	public void initZygote(StartupParam startupParam) throws Throwable {
@@ -71,26 +82,52 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		String themeId = pref.getString("pref_themeid", DEF_THEMEID);
 		String themeColor = pref.getString("pref_themecolor", DEF_THEMECOLOR);
 
+		mCacheFolder = pref.getString("pref_cache_folder", null);
+		mDensityDpi = pref.getInt("pref_density_dpi", -1);
+		if (mCacheFolder != null && mDensityDpi > 0)
+			mCustomButtons = new CustomButtons(mCacheFolder, mDensityDpi, CustomButtons.FILENAME_PREFIX);
+
+		// backup stock button drawables
+		mStockButtons.put("ic_sysbar_back", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_back"));
+		mStockButtons.put("ic_sysbar_home", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_home"));
+		mStockButtons.put("ic_sysbar_menu", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_menu"));
+		mStockButtons.put("ic_sysbar_recent", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_recent"));
+
 		// replace NavBar icons drawables, for theme only
 		if (useTheme) {
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, false)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_ime",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", true, false)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_land",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, true)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, false)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home_land",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, true)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, false)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu_land",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, true)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
-			resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent_land",
-					modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, true)));
+			if (mThemeIcons.getThemeExample(themeId) == -1) {
+				// user define theme
+				if (mCustomButtons != null) {
+					replaceCustomButton(resparam.res, "ic_sysbar_back", "Back", false, false);
+					replaceCustomButton(resparam.res, "ic_sysbar_back_ime", "Back", true, false);
+					replaceCustomButton(resparam.res, "ic_sysbar_back_land", "Back", false, true);
+					replaceCustomButton(resparam.res, "ic_sysbar_home", "Home", false, false);
+					replaceCustomButton(resparam.res, "ic_sysbar_home_land", "Home", false, true);
+					replaceCustomButton(resparam.res, "ic_sysbar_menu", "Menu", useAltMenu, false);
+					replaceCustomButton(resparam.res, "ic_sysbar_menu_land", "Menu", useAltMenu, true);
+					replaceCustomButton(resparam.res, "ic_sysbar_recent", "Recent", false, false);
+					replaceCustomButton(resparam.res, "ic_sysbar_recent_land", "Recent", false, true);
+				}
+			} else {
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, false)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_ime",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", true, false)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_land",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, true)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, false)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home_land",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, true)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, false)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu_land",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, true)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
+				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent_land",
+						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, true)));
+			}
 		}
 
 		// replace NavBar layout
@@ -106,6 +143,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				String themeId = pref.getString("pref_themeid", DEF_THEMEID);
 				String themeColor = pref.getString("pref_themecolor", DEF_THEMECOLOR);
 				String[] orderList = pref.getString("pref_order", DEF_BUTTONS_ORDER_LIST).split(",");
+				boolean showSearch = pref.getBoolean("pref_show_search", false);
 				buttonsCount = orderList.length;
 
 				mContext = liparam.view.getContext();
@@ -115,6 +153,25 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				screenWidth = point.x;
 				buttonWidth = Math.round((float) screenWidth / (float) buttonsCount);
 				XposedBridge.log(String.format("screenWidth:%d, buttonWidth:%d", screenWidth, buttonWidth));
+
+				// write stock button images to cache folder
+				try {
+					if (mStockButtons.size() > 0) {
+						Iterator<Entry<String, Bitmap>> it = mStockButtons.entrySet().iterator();
+						while (it.hasNext()) {
+							Map.Entry<String, Bitmap> vp = it.next();
+							Bitmap bitmap = vp.getValue();
+							if (bitmap != null) {
+								Utils.saveBitmapAsFile(mContext.getExternalCacheDir(), vp.getKey() + ".png", bitmap);
+								bitmap.recycle();
+								bitmap = null;
+							}
+							it.remove();
+						}
+					}
+				} catch (Exception e) {
+					XposedBridge.log(e.getMessage());
+				}
 
 				FrameLayout rot0 = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("rot0", "id", CLASSNAME_SYSTEMUI));
 				FrameLayout rot90 = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("rot90", "id", CLASSNAME_SYSTEMUI));
@@ -134,17 +191,19 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 					// handle nav buttions
 					if (rot0NavButtons != null) {
 						Map<String, ImageView> viewList = new HashMap<String, ImageView>();
-						Drawable searchButtonDrawable = useTheme ? modRes.getDrawable(mThemeIcons.getIconResId(themeId, themeColor, "Search", false, false))
-								: modRes.getDrawable(R.drawable.ic_sysbar_search);
 
 						viewList.put("Home", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("home", "id", CLASSNAME_SYSTEMUI)));
 						viewList.put("Menu", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("menu", "id", CLASSNAME_SYSTEMUI)));
 						viewList.put("Back", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("back", "id", CLASSNAME_SYSTEMUI)));
 						viewList.put("Recent", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("recent_apps", "id", CLASSNAME_SYSTEMUI)));
-						viewList.put(
-								"Search",
-								createButtonView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, "ic_sysbar_highlight", searchButtonDrawable,
-										KeyEvent.KEYCODE_SEARCH, "Search", true));
+
+						if (showSearch) {
+							Drawable searchButtonDrawable = getSearchButton(useTheme, themeId, themeColor, false);
+							viewList.put(
+									"Search",
+									createButtonView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, "ic_sysbar_highlight", searchButtonDrawable,
+											KeyEvent.KEYCODE_SEARCH, "Search", true));
+						}
 
 						rot0NavButtons.removeAllViews();
 						// add selected buttons
@@ -154,6 +213,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								view.setVisibility(View.VISIBLE);
 								view.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
 								view.setPadding(0, 0, 0, 0);
+								view.setScaleType(ScaleType.FIT_CENTER);
 								rot0NavButtons.addView(view);
 							}
 						}
@@ -203,17 +263,18 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							rot90NavButtons.setGravity(Gravity.CENTER_HORIZONTAL);
 
 						Map<String, ImageView> viewList = new HashMap<String, ImageView>();
-						Drawable searchButtonDrawable = useTheme ? modRes.getDrawable(mThemeIcons.getIconResId(themeId, themeColor, "Search", false,
-								!tabletMode)) : modRes.getDrawable(tabletMode ? R.drawable.ic_sysbar_search : R.drawable.ic_sysbar_search_land);
 
 						viewList.put("Back", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("back", "id", CLASSNAME_SYSTEMUI)));
 						viewList.put("Home", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("home", "id", CLASSNAME_SYSTEMUI)));
 						viewList.put("Recent", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("recent_apps", "id", CLASSNAME_SYSTEMUI)));
 						viewList.put("Menu", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("menu", "id", CLASSNAME_SYSTEMUI)));
-						viewList.put(
-								"Search",
-								createButtonView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, tabletMode ? "ic_sysbar_highlight"
-										: "ic_sysbar_highlight_land", searchButtonDrawable, KeyEvent.KEYCODE_SEARCH, "Search", true));
+						if (showSearch) {
+							Drawable searchButtonDrawable = getSearchButton(useTheme, themeId, themeColor, !tabletMode);
+							viewList.put(
+									"Search",
+									createButtonView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, tabletMode ? "ic_sysbar_highlight"
+											: "ic_sysbar_highlight_land", searchButtonDrawable, KeyEvent.KEYCODE_SEARCH, "Search", true));
+						}
 
 						rot90NavButtons.removeAllViews();
 						// add selected buttons
@@ -224,6 +285,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 									view.setVisibility(View.VISIBLE);
 									view.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
 									view.setPadding(0, 0, 0, 0);
+									view.setScaleType(ScaleType.FIT_CENTER);
 									rot90NavButtons.addView(view);
 								}
 							}
@@ -234,6 +296,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 									view.setVisibility(View.VISIBLE);
 									view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, buttonWidth, 0.0f));
 									view.setPadding(0, 0, 0, 0);
+									view.setScaleType(ScaleType.FIT_CENTER);
 									rot90NavButtons.addView(view);
 								}
 							}
@@ -381,5 +444,38 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		view.setScaleType(ScaleType.CENTER);
 		view.setTag(tag);
 		return view;
+	}
+
+	void replaceCustomButton(XResources res, String resName, String type, boolean isAlt, boolean landscape) {
+		Bitmap bitmap = mCustomButtons.getBitmap(type, isAlt, landscape);
+		if (bitmap != null) {
+			final Drawable drawable = new BitmapDrawable(res, bitmap);
+			res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", resName, new XResources.DrawableLoader() {
+				@Override
+				public Drawable newDrawable(XResources res, int id) throws Throwable {
+					return drawable;
+				}
+			});
+		}
+	}
+
+	Drawable getSearchButton(boolean useTheme, String themeId, String themeColor, boolean landscape) {
+		Drawable drawable = null;
+		if (useTheme) {
+			if (mThemeIcons.getThemeExample(themeId) == -1) {
+				if (mCustomButtons != null) {
+					Bitmap bitmap = mCustomButtons.getBitmap("Search", false, landscape);
+					if (bitmap != null) {
+						drawable = new BitmapDrawable(modRes, bitmap);
+					}
+				}
+			}
+			if (drawable == null)
+				drawable = modRes.getDrawable(mThemeIcons.getIconResId(themeId, themeColor, "Search", false, landscape));
+		} else {
+			drawable = modRes.getDrawable(landscape ? R.drawable.ic_sysbar_search_land : R.drawable.ic_sysbar_search);
+		}
+
+		return drawable;
 	}
 }

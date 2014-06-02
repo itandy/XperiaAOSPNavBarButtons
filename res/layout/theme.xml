@@ -49,11 +49,23 @@
         android:id="@id/theme_example"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/color_Label"
+        android:layout_above="@+id/custom_theme_panel"
         android:scaleType="center" />
 
+    <LinearLayout
+        android:id="@id/custom_theme_panel"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_above="@+id/color_label"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:background="#ff000000" >
+
+    </LinearLayout>
+
     <TextView
-        android:id="@id/color_Label"
+        android:id="@id/color_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/color_panel"
