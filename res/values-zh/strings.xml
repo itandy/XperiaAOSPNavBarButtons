@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Xperia/AOSP導航欄自定義</string>
+    <string name="navbar_preview">導航欄效果預覽</string>
+    <string name="available_themes">可用風格</string>
+    <string name="selected_theme">選中導航欄風格</string>
+    <string name="available_colors">可用顏色</string>
+    <string name="confirm">確認</string>
+    <string name="import_button_iamges">導入按鍵圖標圖片</string>
+    <string name="changelog_full_title">升級日誌</string>
+    <string name="changelog_title">"更新了什麼"</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">更多</string>
+
+    <string name="title_show_recent">顯示後台切換鍵</string>
+    <string name="summ_show_recent">顯示後台切換鍵</string>
+
+    <string name="title_show_menu">顯示菜單鍵</string>
+    <string name="summ_show_menu">顯示菜單鍵</string>
+
+    <string name="title_show_search">顯示搜索鍵</string>
+    <string name="summ_show_search">顯示搜索鍵</string>
+
+    <string name="title_reorder">排序按鍵</string>
+    <string name="summ_reorder">重新排序按鍵</string>
+
+    <string name="title_theme">選擇風格</string>
+    <string name="summ_theme">選擇導航欄風格</string>
+
+    <string name="title_use_alt_menu">使用備用菜單鍵按鈕</string>
+    <string name="summ_use_alt_menu">僅選擇了風格後才有效</string>
+
+    <string name="title_restart_systemui">重啟系統界面 (需要Root權限)</string>
+    <string name="summ_restart_systemui">請重啟系統界面以完成修改.\n\n如果通知欄或導航欄無法正確顯示, 請重啟設備.</string>
+
+    <string name="title_hints">提示</string>
+    <string name="summ_hints">如何自定義按鍵圖標</string>
+    
+    <string name="custom_button_images_found">找到%d個圖像文件</string>
+</resources>

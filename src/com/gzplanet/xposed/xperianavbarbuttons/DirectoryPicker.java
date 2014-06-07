@@ -81,20 +81,19 @@ public class DirectoryPicker extends Activity {
 		if (mCustomButtons.getMainButtonsCount() > 0) {
 			final int buttonWidth = Math.round((float) Utils.getScreenWidth(this) / 5f);
 			final int navBarHeight = Utils.getNavBarHeight(getResources());
-			
+
 			ViewGroup vgRoot = (ViewGroup) findViewById(R.id.preview_panel);
 			ViewGroup vg = (ViewGroup) findViewById(R.id.preview_buttons_container);
 			TextView tv = (TextView) findViewById(R.id.custom_buttons_found);
 			Button btn = (Button) findViewById(R.id.btn_confirm);
 
 			ArrayList<String> examples = mCustomButtons.getMainButtonNames();
-			for (String type: examples) {
+			for (String type : examples) {
 				Bitmap bitmap = mCustomButtons.getBitmap(type, false, false);
 				if (bitmap != null) {
 					mCustomButtonFiles.put(type, bitmap);
 					ImageView iv = new ImageView(this);
-					iv.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth, navBarHeight > 0 ? navBarHeight
-							: LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
+					iv.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth, navBarHeight > 0 ? navBarHeight : LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
 					iv.setScaleType(ScaleType.FIT_CENTER);
 					iv.setImageBitmap(bitmap);
 					vg.addView(iv);
@@ -103,7 +102,7 @@ public class DirectoryPicker extends Activity {
 
 			if (vg.getChildCount() > 0) {
 				vgRoot.setVisibility(View.VISIBLE);
-				tv.setText(String.format("%d custom button images found", mCustomButtons.getCount()));
+				tv.setText(String.format(getResources().getString(R.string.custom_button_images_found), mCustomButtons.getCount()));
 				btn.setOnClickListener(new OnClickListener() {
 
 					@Override
@@ -142,8 +141,7 @@ public class DirectoryPicker extends Activity {
 		String cacheFolder = null;
 		File cacheDir;
 		try {
-			cacheFolder = getExternalCacheDir().getAbsolutePath().replace(getPackageName(),
-					XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
+			cacheFolder = getExternalCacheDir().getAbsolutePath().replace(getPackageName(), XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
 		} catch (Exception e) {
 		} finally {
 			cacheDir = new File(cacheFolder);
@@ -160,23 +158,25 @@ public class DirectoryPicker extends Activity {
 
 		// write custom button images to cache folder
 		mCustomButtons.importIntoCacheFolder(cacheFolder);
-//		try {
-//			if (mCustomButtonFiles.size() > 0) {
-//				Iterator<Entry<String, Bitmap>> it = mCustomButtonFiles.entrySet().iterator();
-//				while (it.hasNext()) {
-//					Map.Entry<String, Bitmap> vp = it.next();
-//					Bitmap bitmap = vp.getValue();
-//					if (bitmap != null) {
-//						Utils.saveBitmapAsFile(cacheDir, CustomButtons.FILENAME_PREFIX + vp.getKey(), bitmap);
-//						bitmap.recycle();
-//						bitmap = null;
-//					}
-//					it.remove();
-//				}
-//			}
-//		} catch (Exception e) {
-//			XposedBridge.log(e.getMessage());
-//		}
+		// try {
+		// if (mCustomButtonFiles.size() > 0) {
+		// Iterator<Entry<String, Bitmap>> it =
+		// mCustomButtonFiles.entrySet().iterator();
+		// while (it.hasNext()) {
+		// Map.Entry<String, Bitmap> vp = it.next();
+		// Bitmap bitmap = vp.getValue();
+		// if (bitmap != null) {
+		// Utils.saveBitmapAsFile(cacheDir, CustomButtons.FILENAME_PREFIX +
+		// vp.getKey(), bitmap);
+		// bitmap.recycle();
+		// bitmap = null;
+		// }
+		// it.remove();
+		// }
+		// }
+		// } catch (Exception e) {
+		// XposedBridge.log(e.getMessage());
+		// }
 
 		Intent intent = new Intent(this, ThemeActivity.class);
 		intent.putExtra("usetheme", mUseTheme);

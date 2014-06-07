@@ -4,42 +4,42 @@
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_show_recent"
-        android:summary="Show recent apps button"
-        android:title="Show Recent" />
+        android:summary="@string/summ_show_recent"
+        android:title="@string/title_show_recent" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_show_menu"
-        android:summary="Show menu button"
-        android:title="Show Menu" />
+        android:summary="@string/summ_show_menu"
+        android:title="@string/title_show_menu" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_show_search"
-        android:summary="Show search button"
-        android:title="Show Search" />
+        android:summary="@string/summ_show_search"
+        android:title="@string/title_show_search" />
 
     <Preference
         android:key="pref_reorder"
-        android:summary="Re-order buttons in NavBar"
-        android:title="Re-order buttons" />
+        android:summary="@string/summ_reorder"
+        android:title="@string/title_reorder" />
     <Preference
         android:key="pref_theme"
-        android:summary="Select theme for NavBar buttons"
-        android:title="Select theme" />
+        android:summary="@string/summ_theme"
+        android:title="@string/title_theme" />
 
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="pref_use_alt_menu"
-        android:summary="Only available when theme is selected"
-        android:title="Use alternate menu button" />
+        android:summary="@string/summ_use_alt_menu"
+        android:title="@string/title_use_alt_menu" />
 
     <Preference
         android:key="pref_restart_systemui"
-        android:summary="Restart SysmteUI process to apply changes immediately.\n\nIf notification bar or NavBar are not displaying correctly or any icons are missing, please reboot your device."
-        android:title="Restart SystemUI (Root required)" />
+        android:summary="@string/summ_restart_systemui"
+        android:title="@string/title_restart_systemui" />
 
     <Preference
         android:key="pref_hints"
-        android:summary="How to use user define button images"
-        android:title="Hints" />
+        android:summary="@string/summ_hints"
+        android:title="@string/title_hints" />
 
 </PreferenceScreen>

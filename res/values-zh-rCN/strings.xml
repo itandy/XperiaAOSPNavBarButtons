@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Xperia/AOSP导航栏自定义</string>
+    <string name="navbar_preview">导航栏效果预览</string>
+    <string name="available_themes">可用风格</string>
+    <string name="selected_theme">选中导航栏风格</string>
+    <string name="available_colors">可用颜色</string>
+    <string name="confirm">确认</string>
+    <string name="import_button_iamges">导入按键图标图片</string>
+    <string name="changelog_full_title">升级日志</string>
+    <string name="changelog_title">"更新了什么"</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">更多</string>
+
+    <string name="title_show_recent">显示后台切换键</string>
+    <string name="summ_show_recent">显示后台切换键</string>
+
+    <string name="title_show_menu">显示菜单键</string>
+    <string name="summ_show_menu">显示菜单键</string>
+
+    <string name="title_show_search">显示搜索键</string>
+    <string name="summ_show_search">显示搜索键</string>
+
+    <string name="title_reorder">排序按键</string>
+    <string name="summ_reorder">重新排序按键</string>
+
+    <string name="title_theme">选择风格</string>
+    <string name="summ_theme">选择导航栏风格</string>
+
+    <string name="title_use_alt_menu">使用备用菜单键按钮</string>
+    <string name="summ_use_alt_menu">仅选择了风格后才有效</string>
+
+    <string name="title_restart_systemui">重启系统界面 (需要Root权限)</string>
+    <string name="summ_restart_systemui">请重启系统界面以完成修改.\n\n如果通知栏或导航栏无法正确显示, 请重启设备.</string>
+
+    <string name="title_hints">提示</string>
+    <string name="summ_hints">如何自定义按键图标</string>
+    
+    <string name="custom_button_images_found">找到%d个图像文件</string>
+</resources>

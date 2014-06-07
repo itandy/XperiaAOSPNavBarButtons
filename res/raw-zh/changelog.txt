@@ -1,0 +1,52 @@
+﻿<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    { 
+          color:#C0F0C0; 
+          font-size:1.2em; 
+          font-weight:bold; 
+          margin-top:1em; 
+          margin-bottom:0.5em }
+      div.subtitle { 
+          color:#C0F0C0; 
+          font-size:0.8em; 
+          margin-bottom:1em }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+$ 3.0
+  % 版本 3.0
+  _ 可自定義按鍵圖標
+  !<B>如何使用圖片自定義按鍵圖標:</B>
+  #準備好用作按鍵的PNG格式圖片。使用以下文件名格式命名各個文件。如果沒有自定義全部按鍵，軟件將會用默認按鍵替代沒自定義到的按鍵。
+  #將文件複製到<B>內部儲存</B>。可以放到內部儲存的任何文件夾裡。也可以放到內部儲存的根目錄。
+  #在軟件選擇風格頁面，有一個稱為<B>User define</B>的風格。
+  #如果你是第一次點擊User define風格選項，應該會看到內部儲存的文件夾列表。如不是，應該會看到一個叫<B>導入按鍵圖標圖片</B>的選項。
+  #找到你之前保存按鍵圖片的文件夾。
+  #如果成功檢測到，會顯示找到的圖像文件的數量。
+  #點擊確認。
+  #軟件將文件複製到自己的緩存文件夾，你可以刪除原始圖片了。
+  #重啟系統界面或重啟設備後生效。
+	<BR>     
+  !<B>圖片的命名格式:</B>
+  *ic_sysbar_back.png - 返回鍵（豎屏）
+  *ic_sysbar_back_land.png - 返回鍵（橫屏）
+  *ic_sysbar_back_ime.png - 返回鍵（鍵盤豎屏顯示時）
+  *ic_sysbar_back_ime_land.png - 返回鍵（鍵盤橫屏顯示時）
+  *ic_sysbar_home.png - 主頁鍵（豎屏）
+  *ic_sysbar_home_land.png - 主頁鍵（橫屏）
+  *ic_sysbar_menu.png - 菜單鍵（豎屏）
+  *ic_sysbar_menu_land.png - 菜單鍵（橫屏）
+  *ic_sysbar_menu_alt.png - 菜單鍵（豎屏和備用）
+  *ic_sysbar_menu_alt_land.png - 菜單鍵（橫屏和備用）
+  *ic_sysbar_recent.png - 後台切換鍵（豎屏）
+  *ic_sysbar_recent_land.png - 後台切換鍵（橫向）
+  *ic_sysbar_search.png - 搜索鍵（豎屏）
+  *ic_sysbar_search_land.png - 搜索鍵（橫屏）
+
+$ END_OF_CHANGE_LOG
+  </body>
+</html>

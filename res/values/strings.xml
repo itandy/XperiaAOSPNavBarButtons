@@ -12,4 +12,30 @@
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_ok_button">OK</string>
     <string name="changelog_show_full">more</string>
+
+    <string name="title_show_recent">Show Recent</string>
+    <string name="summ_show_recent">Show recent apps button</string>
+
+    <string name="title_show_menu">Show Menu</string>
+    <string name="summ_show_menu">Show menu button</string>
+
+    <string name="title_show_search">Show Search</string>
+    <string name="summ_show_search">Show search button</string>
+
+    <string name="title_reorder">Re-order buttons</string>
+    <string name="summ_reorder">Re-order buttons in NavBar</string>
+
+    <string name="title_theme">Select theme</string>
+    <string name="summ_theme">Select theme for NavBar buttons</string>
+
+    <string name="title_use_alt_menu">Use alternate menu button</string>
+    <string name="summ_use_alt_menu">Only available when theme is selected</string>
+
+    <string name="title_restart_systemui">Restart SystemUI (Root required)</string>
+    <string name="summ_restart_systemui">Restart SysmteUI process to apply changes immediately.\n\nIf notification bar or NavBar are not displaying correctly or any icons are missing, please reboot your device.</string>
+
+    <string name="title_hints">Hints</string>
+    <string name="summ_hints">How to use user define button images</string>
+    
+    <string name="custom_button_images_found">%d custom button images found</string>
 </resources>
