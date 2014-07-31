@@ -190,6 +190,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 					// handle nav buttions
 					if (rot0NavButtons != null) {
+						rot0NavButtons.setGravity(Gravity.CENTER);
 						Map<String, ImageView> viewList = new HashMap<String, ImageView>();
 
 						viewList.put("Home", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("home", "id", CLASSNAME_SYSTEMUI)));
@@ -227,6 +228,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 					// handle lights out
 					if (rot0LightsOut != null) {
+						rot0LightsOut.setGravity(Gravity.CENTER);
 						rot0LightsOut.removeAllViews();
 						int i = 0;
 						while (i < buttonsCount) {
@@ -238,6 +240,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 					// handle lights out high
 					if (rot0LightsOutHigh != null) {
+						rot0LightsOutHigh.setGravity(Gravity.CENTER);
 						rot0LightsOutHigh.removeAllViews();
 						int i = 0;
 						while (i < buttonsCount) {
@@ -256,6 +259,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 					// handle nav buttions
 					if (rot90NavButtons != null) {
+						rot90NavButtons.setGravity(Gravity.CENTER);
+
 						// determine if a tablet is in use
 						boolean tabletMode = rot90NavButtons.getOrientation() == LinearLayout.HORIZONTAL;
 
@@ -310,6 +315,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 					// handle lights out
 					if (rot90LightsOut != null) {
+						rot90LightsOut.setGravity(Gravity.CENTER);
 						rot90LightsOut.removeAllViews();
 						int i = 0;
 						while (i < buttonsCount) {
@@ -321,6 +327,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 					// handle lights out high
 					if (rot90LightsOutHigh != null) {
+						rot90LightsOutHigh.setGravity(Gravity.CENTER);
 						rot90LightsOutHigh.removeAllViews();
 						int i = 0;
 						while (i < buttonsCount) {
