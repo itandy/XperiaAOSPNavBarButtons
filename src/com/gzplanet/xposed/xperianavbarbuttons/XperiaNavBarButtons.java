@@ -145,14 +145,17 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				String[] orderList = pref.getString("pref_order", DEF_BUTTONS_ORDER_LIST).split(",");
 				boolean showSearch = pref.getBoolean("pref_show_search", false);
 				buttonsCount = orderList.length;
+				int leftMargin = pref.getInt("pref_left_margin", 0);
+				int rightMargin = pref.getInt("pref_right_margin", 0);
 
 				mContext = liparam.view.getContext();
 				final Display defaultDisplay = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 				final Point point = new Point();
 				defaultDisplay.getSize(point);
 				screenWidth = point.x;
-				buttonWidth = Math.round((float) screenWidth / (float) buttonsCount);
-				XposedBridge.log(String.format("screenWidth:%d, buttonWidth:%d", screenWidth, buttonWidth));
+				buttonWidth = Math.round((float) (screenWidth - leftMargin - rightMargin) / (float) buttonsCount);
+				XposedBridge.log(String.format("screenWidth:%d, buttonWidth:%d, leftMargin:%d, rightMargin:%d", screenWidth, buttonWidth, leftMargin,
+						rightMargin));
 
 				// write stock button images to cache folder
 				try {
@@ -207,6 +210,10 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						}
 
 						rot0NavButtons.removeAllViews();
+						// left margin
+						if (leftMargin > 0)
+							addPlaceHolder(mContext, rot0NavButtons, leftMargin, LinearLayout.LayoutParams.FILL_PARENT);
+
 						// add selected buttons
 						for (int i = 0; i < buttonsCount; i++) {
 							ImageView view = viewList.remove(orderList[i]);
@@ -224,30 +231,52 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							view.setVisibility(View.GONE);
 							rot0NavButtons.addView(view);
 						}
+
+						// right margin
+						if (rightMargin > 0)
+							addPlaceHolder(mContext, rot0NavButtons, rightMargin, LinearLayout.LayoutParams.FILL_PARENT);
 					}
 
 					// handle lights out
 					if (rot0LightsOut != null) {
 						rot0LightsOut.setGravity(Gravity.CENTER);
 						rot0LightsOut.removeAllViews();
+
+						// left margin
+						if (leftMargin > 0)
+							addPlaceHolder(mContext, rot0LightsOut, leftMargin, LinearLayout.LayoutParams.FILL_PARENT);
+
 						int i = 0;
 						while (i < buttonsCount) {
 							rot0LightsOut.addView(createLightsOutView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT,
 									"ic_sysbar_lights_out_dot_small"));
 							i++;
 						}
+
+						// right margin
+						if (rightMargin > 0)
+							addPlaceHolder(mContext, rot0LightsOut, rightMargin, LinearLayout.LayoutParams.FILL_PARENT);
 					}
 
 					// handle lights out high
 					if (rot0LightsOutHigh != null) {
 						rot0LightsOutHigh.setGravity(Gravity.CENTER);
 						rot0LightsOutHigh.removeAllViews();
+
+						// left margin
+						if (leftMargin > 0)
+							addPlaceHolder(mContext, rot0LightsOutHigh, leftMargin, LinearLayout.LayoutParams.FILL_PARENT);
+
 						int i = 0;
 						while (i < buttonsCount) {
 							rot0LightsOutHigh.addView(createLightsOutView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT,
 									"ic_sysbar_lights_out_dot_small_high"));
 							i++;
 						}
+
+						// right margin
+						if (rightMargin > 0)
+							addPlaceHolder(mContext, rot0LightsOutHigh, rightMargin, LinearLayout.LayoutParams.FILL_PARENT);
 					}
 				}
 
@@ -294,7 +323,11 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 									rot90NavButtons.addView(view);
 								}
 							}
-						else
+						else {
+							// left margin
+							if (leftMargin > 0)
+								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.FILL_PARENT, leftMargin);
+
 							for (int i = buttonsCount - 1; i >= 0; i--) {
 								ImageView view = viewList.remove(orderList[i]);
 								if (view != null) {
@@ -305,6 +338,11 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 									rot90NavButtons.addView(view);
 								}
 							}
+
+							// right margin
+							if (rightMargin > 0)
+								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.FILL_PARENT, rightMargin);
+						}
 
 						// add unselected buttons and make them invisible
 						for (ImageView view : viewList.values()) {
@@ -317,24 +355,42 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 					if (rot90LightsOut != null) {
 						rot90LightsOut.setGravity(Gravity.CENTER);
 						rot90LightsOut.removeAllViews();
+
+						// left margin
+						if (leftMargin > 0)
+							addPlaceHolder(mContext, rot90LightsOut, LinearLayout.LayoutParams.FILL_PARENT, leftMargin);
+
 						int i = 0;
 						while (i < buttonsCount) {
 							rot90LightsOut.addView(createLightsOutView(liparam, LinearLayout.LayoutParams.FILL_PARENT, buttonWidth,
 									"ic_sysbar_lights_out_dot_small"));
 							i++;
 						}
+
+						// right margin
+						if (rightMargin > 0)
+							addPlaceHolder(mContext, rot90LightsOut, LinearLayout.LayoutParams.FILL_PARENT, rightMargin);
 					}
 
 					// handle lights out high
 					if (rot90LightsOutHigh != null) {
 						rot90LightsOutHigh.setGravity(Gravity.CENTER);
 						rot90LightsOutHigh.removeAllViews();
+
+						// left margin
+						if (leftMargin > 0)
+							addPlaceHolder(mContext, rot90LightsOutHigh, LinearLayout.LayoutParams.FILL_PARENT, leftMargin);
+
 						int i = 0;
 						while (i < buttonsCount) {
 							rot90LightsOutHigh.addView(createLightsOutView(liparam, LinearLayout.LayoutParams.FILL_PARENT, buttonWidth,
 									"ic_sysbar_lights_out_dot_small_high"));
 							i++;
 						}
+
+						// right margin
+						if (rightMargin > 0)
+							addPlaceHolder(mContext, rot90LightsOutHigh, LinearLayout.LayoutParams.FILL_PARENT, rightMargin);
 					}
 				}
 
@@ -484,5 +540,11 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		}
 
 		return drawable;
+	}
+	
+	void addPlaceHolder(Context context, LinearLayout parent, int width, int height) {
+		ImageView iv= new ImageView(context);
+		iv.setLayoutParams(new LinearLayout.LayoutParams(width, height, 0.0f));
+		parent.addView(iv);
 	}
 }

@@ -37,5 +37,11 @@
     <string name="title_hints">Hints</string>
     <string name="summ_hints">How to use user define button images</string>
     
+    <string name="title_left_margin">Left/Top margin</string>
+    <string name="summ_left_margin">Left/Top margin in pixels</string>
+    
+    <string name="title_right_margin">Right/bottom margin</string>
+    <string name="summ_right_margin">Right/bottom margin in pixels</string>
+    
     <string name="custom_button_images_found">%d custom button images found</string>
 </resources>
