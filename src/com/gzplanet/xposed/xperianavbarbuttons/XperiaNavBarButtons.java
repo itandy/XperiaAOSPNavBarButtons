@@ -228,7 +228,10 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						// add unselected buttons and make them invisible
 						for (ImageView view : viewList.values()) {
-							view.setVisibility(View.GONE);
+							view.setVisibility(View.INVISIBLE);
+							view.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
+							view.setPadding(0, 0, 0, 0);
+							view.setScaleType(ScaleType.FIT_CENTER);
 							rot0NavButtons.addView(view);
 						}
 
@@ -346,7 +349,13 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						// add unselected buttons and make them invisible
 						for (ImageView view : viewList.values()) {
-							view.setVisibility(View.GONE);
+							view.setVisibility(View.INVISIBLE);
+							if (tabletMode)
+								view.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.FILL_PARENT, 0.0f));
+							else
+								view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 0, 0.0f));
+							view.setPadding(0, 0, 0, 0);
+							view.setScaleType(ScaleType.FIT_CENTER);
 							rot90NavButtons.addView(view);
 						}
 					}
@@ -446,7 +455,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								menuButton.setVisibility(pref.getBoolean("pref_show_menu", true) ? (disableHome ? View.INVISIBLE : View.VISIBLE) : View.GONE);
 							if (recentButton != null)
 								recentButton.setVisibility(pref.getBoolean("pref_show_recent", true) ? (disableRecent ? View.INVISIBLE : View.VISIBLE)
-										: View.GONE);
+										: View.INVISIBLE);
 						}
 					});
 		} catch (NoSuchMethodError e2) {
@@ -541,9 +550,9 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 		return drawable;
 	}
-	
+
 	void addPlaceHolder(Context context, LinearLayout parent, int width, int height) {
-		ImageView iv= new ImageView(context);
+		ImageView iv = new ImageView(context);
 		iv.setLayoutParams(new LinearLayout.LayoutParams(width, height, 0.0f));
 		parent.addView(iv);
 	}

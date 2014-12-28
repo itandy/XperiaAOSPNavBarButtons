@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:robobunny="http://robobunny.com" >
 
     <CheckBoxPreference
         android:defaultValue="true"
@@ -32,6 +33,28 @@
         android:summary="@string/summ_use_alt_menu"
         android:title="@string/title_use_alt_menu" />
 
+    <com.robobunny.SeekBarPreference
+        android:defaultValue="0"
+        android:key="pref_left_margin"
+        android:max="400"
+        android:summary="@string/summ_left_margin"
+        android:title="@string/title_left_margin"
+        robobunny:interval="1"
+        robobunny:min="0"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="px" />
+    
+    <com.robobunny.SeekBarPreference
+        android:defaultValue="0"
+        android:key="pref_right_margin"
+        android:max="400"
+        android:summary="@string/summ_right_margin"
+        android:title="@string/title_right_margin"
+        robobunny:interval="1"
+        robobunny:min="0"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="px" />
+    
     <Preference
         android:key="pref_restart_systemui"
         android:summary="@string/summ_restart_systemui"
