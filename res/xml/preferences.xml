@@ -1,68 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:robobunny="http://robobunny.com" >
+    xmlns:robobunny="http://robobunny.com" >
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_show_recent"
-        android:summary="@string/summ_show_recent"
-        android:title="@string/title_show_recent" />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_show_menu"
-        android:summary="@string/summ_show_menu"
-        android:title="@string/title_show_menu" />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_show_search"
-        android:summary="@string/summ_show_search"
-        android:title="@string/title_show_search" />
+    <PreferenceCategory android:title="@string/cat_buttons" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_show_recent"
+            android:summary="@string/summ_show_recent"
+            android:title="@string/title_show_recent" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_show_menu"
+            android:summary="@string/summ_show_menu"
+            android:title="@string/title_show_menu" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_show_search"
+            android:summary="@string/summ_show_search"
+            android:title="@string/title_show_search" />
 
-    <Preference
-        android:key="pref_reorder"
-        android:summary="@string/summ_reorder"
-        android:title="@string/title_reorder" />
-    <Preference
-        android:key="pref_theme"
-        android:summary="@string/summ_theme"
-        android:title="@string/title_theme" />
+        <Preference
+            android:key="pref_reorder"
+            android:summary="@string/summ_reorder"
+            android:title="@string/title_reorder" />
+        <Preference
+            android:key="pref_theme"
+            android:summary="@string/summ_theme"
+            android:title="@string/title_theme" />
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="pref_use_alt_menu"
-        android:summary="@string/summ_use_alt_menu"
-        android:title="@string/title_use_alt_menu" />
-
-    <com.robobunny.SeekBarPreference
-        android:defaultValue="0"
-        android:key="pref_left_margin"
-        android:max="400"
-        android:summary="@string/summ_left_margin"
-        android:title="@string/title_left_margin"
-        robobunny:interval="1"
-        robobunny:min="0"
-        robobunny:unitsLeft=""
-        robobunny:unitsRight="px" />
-    
-    <com.robobunny.SeekBarPreference
-        android:defaultValue="0"
-        android:key="pref_right_margin"
-        android:max="400"
-        android:summary="@string/summ_right_margin"
-        android:title="@string/title_right_margin"
-        robobunny:interval="1"
-        robobunny:min="0"
-        robobunny:unitsLeft=""
-        robobunny:unitsRight="px" />
-    
-    <Preference
-        android:key="pref_restart_systemui"
-        android:summary="@string/summ_restart_systemui"
-        android:title="@string/title_restart_systemui" />
-
-    <Preference
-        android:key="pref_hints"
-        android:summary="@string/summ_hints"
-        android:title="@string/title_hints" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_use_alt_menu"
+            android:summary="@string/summ_use_alt_menu"
+            android:title="@string/title_use_alt_menu" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/cat_layout" >
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="0"
+            android:key="pref_left_margin"
+            android:max="400"
+            android:summary="@string/summ_left_margin"
+            android:title="@string/title_left_margin"
+            robobunny:interval="1"
+            robobunny:min="0"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="px" />
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="0"
+            android:key="pref_right_margin"
+            android:max="400"
+            android:summary="@string/summ_right_margin"
+            android:title="@string/title_right_margin"
+            robobunny:interval="1"
+            robobunny:min="0"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="px" />
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="100"
+            android:key="pref_navbar_height"
+            android:max="150"
+            android:summary="@string/summ_navbar_height"
+            android:title="@string/title_navbar_height"
+            robobunny:interval="10"
+            robobunny:min="50"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="100"
+            android:key="pref_navbar_height_land"
+            android:max="150"
+            android:summary="@string/summ_navbar_height_land"
+            android:title="@string/title_navbar_height_land"
+            robobunny:interval="10"
+            robobunny:min="50"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="100"
+            android:key="pref_navbar_width"
+            android:max="150"
+            android:summary="@string/summ_navbar_width"
+            android:title="@string/title_navbar_width"
+            robobunny:interval="10"
+            robobunny:min="50"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/cat_others" >
+        <Preference
+            android:key="pref_restart_systemui"
+            android:summary="@string/summ_restart_systemui"
+            android:title="@string/title_restart_systemui" />
+        <Preference
+            android:key="pref_hints"
+            android:summary="@string/summ_hints"
+            android:title="@string/title_hints" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

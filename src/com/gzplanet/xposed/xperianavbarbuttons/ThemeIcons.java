@@ -233,6 +233,12 @@ public class ThemeIcons {
 				R.drawable.galaxyblue_ic_sysbar_menu, R.drawable.galaxyblue_ic_sysbar_menu_land, R.drawable.galaxyblue_ic_sysbar_recent,
 				R.drawable.galaxyblue_ic_sysbar_recent_land, R.drawable.galaxyblue_ic_sysbar_search, R.drawable.galaxyblue_ic_sysbar_search_land);
 
+		add("L", "White", R.drawable.l_example, R.drawable.l_ic_sysbar_back, R.drawable.l_ic_sysbar_back_ime,
+				R.drawable.l_ic_sysbar_back, R.drawable.l_ic_sysbar_back_ime, R.drawable.l_ic_sysbar_home,
+				R.drawable.l_ic_sysbar_home, R.drawable.l_ic_sysbar_menu, R.drawable.l_ic_sysbar_menu,
+				R.drawable.l_ic_sysbar_menu, R.drawable.l_ic_sysbar_menu, R.drawable.l_ic_sysbar_recent,
+				R.drawable.l_ic_sysbar_recent, R.drawable.l_ic_sysbar_search, R.drawable.l_ic_sysbar_search);
+
 		add("Nexus", "White", R.drawable.nexus_example, R.drawable.nexus_ic_sysbar_back, R.drawable.nexus_ic_sysbar_back_ime,
 				R.drawable.nexus_ic_sysbar_back_land, R.drawable.nexus_ic_sysbar_back_ime, R.drawable.nexus_ic_sysbar_home,
 				R.drawable.nexus_ic_sysbar_home_land, R.drawable.nexus_ic_sysbar_menu_big, R.drawable.nexus_ic_sysbar_menu_big_land,

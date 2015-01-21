@@ -36,5 +36,24 @@
     <string name="title_hints">提示</string>
     <string name="summ_hints">如何自定义按键图标</string>
     
+    <string name="title_left_margin">左或上边距宽度</string>
+    <string name="summ_left_margin">左或上边距宽度 (象素)</string>
+    
+    <string name="title_right_margin">右或下边距宽度</string>
+    <string name="summ_right_margin">右或下边距宽度 (象素)</string>
+    
+    <string name="title_navbar_height">导航栏高度 (设定后需重启)</string>
+    <string name="summ_navbar_height">导航栏高度比 (50%-150%)</string>
+    
+    <string name="title_navbar_height_land">导航栏高度 (设定后需重启)</string>
+    <string name="summ_navbar_height_land">导航栏高度比 (50%-150%) (平版)</string>
+    
+    <string name="title_navbar_width">导航栏宽度 (设定后需重启)</string>
+    <string name="summ_navbar_width">导航栏宽度比 (50%-150%) (横向)</string>
+    
+    <string name="cat_buttons">按键</string>
+    <string name="cat_layout">导航栏格局</string>
+    <string name="cat_others">其他</string>
+
     <string name="custom_button_images_found">找到%d个图像文件</string>
 </resources>

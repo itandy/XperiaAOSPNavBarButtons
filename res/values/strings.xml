@@ -43,5 +43,18 @@
     <string name="title_right_margin">Right/bottom margin</string>
     <string name="summ_right_margin">Right/bottom margin in pixels</string>
     
+    <string name="title_navbar_height">NavBar height (Reboot required)</string>
+    <string name="summ_navbar_height">NavBar height factor (50%-150%)</string>
+    
+    <string name="title_navbar_height_land">NavBar height (Reboot required)</string>
+    <string name="summ_navbar_height_land">NavBar height factor (50%-150%) (Tablet)</string>
+    
+    <string name="title_navbar_width">NavBar width (Reboot required)</string>
+    <string name="summ_navbar_width">NavBar width factor (50%-150%) (Landscape)</string>
+    
+    <string name="cat_buttons">Buttons</string>
+    <string name="cat_layout">NavBar Layout</string>
+    <string name="cat_others">Others</string>
+    
     <string name="custom_button_images_found">%d custom button images found</string>
 </resources>

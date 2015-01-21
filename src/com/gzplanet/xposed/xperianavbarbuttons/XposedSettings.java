@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.robobunny.SeekBarPreference;
+
 public class XposedSettings extends PreferenceActivity {
 
 	int mScreenWidth;
@@ -41,6 +43,7 @@ public class XposedSettings extends PreferenceActivity {
 	int mDensityDpi;
 	int mLeftMargin;
 	int mRightMargin;
+	int mNavBarHeight;
 
 	CheckBoxPreference mPrefShowRecent;
 	CheckBoxPreference mPrefShowMenu;
@@ -52,6 +55,7 @@ public class XposedSettings extends PreferenceActivity {
 	Preference mPrefHints;
 	Preference mPrefLeftMargin;
 	Preference mPrefRightMargin;
+	Preference mPrefNavBarHeight;
 
 	ButtonSettings mSettings;
 	ThemeIcons mThemeIcons = new ThemeIcons();
@@ -68,6 +72,7 @@ public class XposedSettings extends PreferenceActivity {
 
 		// get screen width
 		mScreenWidth = Utils.getScreenWidth(this);
+		int maxWidth = (int) (mScreenWidth * 0.75);
 
 		mPrefShowRecent = (CheckBoxPreference) findPreference("pref_show_recent");
 		mPrefShowMenu = (CheckBoxPreference) findPreference("pref_show_menu");
@@ -79,6 +84,7 @@ public class XposedSettings extends PreferenceActivity {
 		mPrefHints = (Preference) findPreference("pref_hints");
 		mPrefLeftMargin = (Preference) findPreference("pref_left_margin");
 		mPrefRightMargin = (Preference) findPreference("pref_right_margin");
+		mPrefNavBarHeight = (Preference) findPreference("pref_navbar_height");
 
 		reloadPreferences();
 
@@ -195,12 +201,25 @@ public class XposedSettings extends PreferenceActivity {
 			}
 
 		});
+		((SeekBarPreference) mPrefLeftMargin).setMaxValue(maxWidth);
 
 		mPrefRightMargin.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				mRightMargin = (Integer) newValue;
+				updatePreviewPanel();
+				return true;
+			}
+
+		});
+		((SeekBarPreference) mPrefRightMargin).setMaxValue(maxWidth);
+
+		mPrefNavBarHeight.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				mNavBarHeight = (Integer) newValue;
 				updatePreviewPanel();
 				return true;
 			}
@@ -294,7 +313,7 @@ public class XposedSettings extends PreferenceActivity {
 		mButtonWidth = Math.round((float) (mScreenWidth - mLeftMargin - mRightMargin) / (float) mButtonsCount);
 
 		// get default navbar height
-		int navBarHeight = Utils.getNavBarHeight(getResources());
+		int navBarHeight = (int) Utils.getNavBarHeight(getResources()) * mNavBarHeight / 100;
 
 		LinearLayout panel = (LinearLayout) findViewById(R.id.previewPanel);
 		if (navBarHeight > 0)
@@ -353,6 +372,8 @@ public class XposedSettings extends PreferenceActivity {
 
 		mLeftMargin = pref.getInt("pref_left_margin", 0);
 		mRightMargin = pref.getInt("pref_right_margin", 0);
+		
+		mNavBarHeight = pref.getInt("pref_navbar_height", 100);
 	}
 
 	// store necesary info for user define theme to work
