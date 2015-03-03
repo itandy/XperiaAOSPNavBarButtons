@@ -33,6 +33,19 @@
             android:key="pref_use_alt_menu"
             android:summary="@string/summ_use_alt_menu"
             android:title="@string/title_use_alt_menu" />
+
+        <ListPreference
+            android:defaultValue="84"
+            android:entries="@array/array_search_func_name"
+            android:entryValues="@array/array_search_func_keycode"
+            android:key="pref_search_function"
+            android:title="@string/title_search_function" />
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/array_search_func_name"
+            android:entryValues="@array/array_search_func_keycode"
+            android:key="pref_search_longpress_function"
+            android:title="@string/title_search_longpress_function" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/cat_layout" >
         <com.robobunny.SeekBarPreference
@@ -96,5 +109,8 @@
             android:summary="@string/summ_hints"
             android:title="@string/title_hints" />
     </PreferenceCategory>
+
+    <com.gzplanet.xposed.xperianavbarbuttons.AppListPreference android:key="pref_search_function_apps" />
+    <com.gzplanet.xposed.xperianavbarbuttons.AppListPreference android:key="pref_search_longpress_function_apps" />
 
 </PreferenceScreen>

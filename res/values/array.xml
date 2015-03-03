@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="array_search_func_name">
+        <item>@string/text_none</item>
+        <item>@string/text_calculator</item>
+        <item>@string/text_calendar</item>
+        <item>@string/text_call</item>
+        <item>@string/text_camera</item>
+        <item>@string/text_contacts</item>
+        <item>@string/text_search</item>
+        <item>@string/text_switch_lastapp</item>
+        <item>@string/text_screenshot</item>
+        <item>@string/text_screen_off</item>
+        <item>@string/text_power_menu</item>
+        <item>@string/text_notification_panel</item>
+        <item>@string/text_quick_settings_panel</item>
+        <item>@string/text_launch_app</item>
+    </string-array>
+    <string-array name="array_search_func_keycode">
+        <item>-1</item>
+        <item>210</item>
+        <item>208</item>
+        <item>5</item>
+        <item>27</item>
+        <item>207</item>
+        <item>84</item>
+        <item>-2</item>
+        <item>-3</item>
+        <item>-4</item>
+        <item>-5</item>
+        <item>-6</item>
+        <item>-7</item>
+        <item>-8</item>
+    </string-array>
+
+</resources>

@@ -51,9 +51,32 @@
     <string name="title_navbar_width">導航欄寬度 (設定後需重啟)</string>
     <string name="summ_navbar_width">導航欄寬度比 (50%-150%) (橫向)</string>
     
+    <string name="title_search_function">搜尋鍵功能 (設定後需重啟)</string>
+    <string name="summ_search_function">己設定搜尋鍵功能: %s</string>
+    <string name="summ_search_function2" formatted="false">己設定搜尋鍵功能: %s (%s)</string>
+    
+    <string name="title_search_longpress_function">搜尋鍵長按功能 (設定後需重啟)</string>
+    
     <string name="cat_buttons">按鍵</string>
     <string name="cat_layout">導航欄格局</string>
     <string name="cat_others">其他</string>
 
     <string name="custom_button_images_found">找到%d個圖像文件</string>
+
+	<string name="text_none">沒有功能</string>
+    <string name="text_calculator">計算機</string>
+    <string name="text_calendar">日曆</string>
+    <string name="text_call">電話</string>
+    <string name="text_camera">相機</string>
+    <string name="text_contacts">人物</string>
+    <string name="text_search">搜尋</string>
+    <string name="text_switch_lastapp">切換至上一個應用程式</string>
+    <string name="text_screenshot">螢幕截圖</string>
+    <string name="text_screen_off">關閉螢幕</string>
+    <string name="text_power_menu">電源選單</string>
+    <string name="text_notification_panel">展開通知面板</string>
+    <string name="text_quick_settings_panel">展開快速設定面板</string>
+    <string name="text_launch_app">啟動應用程式</string>
+    
+    <string name="msg_unknown_app">啟動應用程式出錯</string>
 </resources>

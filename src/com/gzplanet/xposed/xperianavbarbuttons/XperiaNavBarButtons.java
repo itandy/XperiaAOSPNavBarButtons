@@ -13,11 +13,16 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.input.InputManager;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.WindowManagerPolicy.WindowState;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -35,6 +40,7 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResou
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated.LayoutInflatedParam;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
+import de.robv.android.xposed.callbacks.XCallback;
 
 public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookInitPackageResources, IXposedHookLoadPackage {
 	final static String CLASSNAME_SYSTEMUI = "com.android.systemui";
@@ -43,6 +49,15 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 	final static String DEF_THEMEID = "Stock";
 	final static String DEF_THEMECOLOR = "White";
+
+	final static int KEYCODE_NONE = -1;
+	final static int KEYCODE_SWITCH_LAST_APP = -2;
+	final static int KEYCODE_TAKE_SCREENSHOT = -3;
+	final static int KEYCODE_SCREEN_OFF = -4;
+	final static int KEYCODE_POWER_MENU = -5;
+	final static int KEYCODE_NOTIFICATION_PANEL = -6;
+	final static int KEYCODE_QUICK_SETTINGS_PANEL = -7;
+	final static int KEYCODE_LAUNCH_APP = -8;
 
 	private static String MODULE_PATH = null;
 	private final static String DEF_BUTTONS_ORDER_LIST = "Home,Menu,Recent,Back,Search";
@@ -56,6 +71,11 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 	XModuleResources modRes;
 
 	static XSharedPreferences pref;
+	static int mKeyCodeLongPress;
+	static String mSearchFuncApp = null;
+	static String mSearchLongPressFuncApp = null;
+	static boolean mSearchKeyLongPressed = false;
+	static boolean mInjectedKeyCode = false;
 
 	Map<String, Bitmap> mStockButtons = new HashMap<String, Bitmap>();
 
@@ -68,6 +88,12 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		// recovery/script
 		pref.makeWorldReadable();
 
+		pref.reload();
+		mKeyCodeLongPress = Integer.parseInt(pref.getString("pref_search_longpress_function", String.valueOf(KEYCODE_NONE)));
+		mSearchFuncApp = pref.getString("pref_search_function_apps", null);
+		mSearchLongPressFuncApp = pref.getString("pref_search_longpress_function_apps", null);
+
+		// handle custom navbar height
 		try {
 			final Class<?> phoneWindowManager = XposedHelpers.findClass(CLASSNAME_PHONEWINDOWMANAGER, null);
 
@@ -109,6 +135,124 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		} catch (NoSuchMethodError e2) {
 			XposedBridge.log("Method setInitialDisplaySize not found");
 		}
+
+		// handle custom search button functions
+		try {
+			final Class<?> phoneWindowManager = XposedHelpers.findClass(CLASSNAME_PHONEWINDOWMANAGER, null);
+
+			XposedHelpers.findMethodExact(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class, int.class, boolean.class);
+			XposedHelpers.findAndHookMethod(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class, int.class, boolean.class, new XC_MethodHook(
+					XCallback.PRIORITY_HIGHEST) {
+				protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+					boolean systemBooted = XposedHelpers.getBooleanField(param.thisObject, "mSystemBooted");
+					if (!systemBooted) {
+						param.setResult(0);
+						return;
+					}
+
+					KeyEvent event = (KeyEvent) param.args[0];
+					boolean handled = false;
+//					XposedBridge.log(String.format("mKeyCodeLongPress:%d, mSearchFuncApp:%s, mSearchLongPressFuncApp:%s", mKeyCodeLongPress, mSearchFuncApp,
+//							mSearchLongPressFuncApp));
+
+					final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+					final int keyCode = event.getKeyCode();
+
+					if (keyCode != KeyEvent.KEYCODE_MENU && keyCode != KeyEvent.KEYCODE_BACK) {
+						Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
+						Handler handler = (Handler) XposedHelpers.getObjectField(param.thisObject, "mHandler");
+
+						if (keyCode < 0 || mKeyCodeLongPress != KEYCODE_NONE) {
+							if (down) {
+								if (event.getRepeatCount() > 0) {
+									// handle long pressed
+									mSearchKeyLongPressed = true;
+									if (mKeyCodeLongPress != KEYCODE_NONE) {
+										performAction(context, handler, mKeyCodeLongPress, true, param.thisObject, mSearchLongPressFuncApp);
+										handled = true;
+									}
+								}
+							} else {
+								// handle single tap
+								if (!mSearchKeyLongPressed && keyCode < KEYCODE_NONE) {
+									performAction(context, handler, keyCode, false, param.thisObject, mSearchFuncApp);
+									handled = true;
+								}
+								if (!mInjectedKeyCode)
+									mSearchKeyLongPressed = false;
+								mInjectedKeyCode = false;
+							}
+							if (handled)
+								param.setResult(0);
+							return;
+						}
+					}
+				};
+			});
+		} catch (ClassNotFoundError e) {
+			XposedBridge.log("Class PhoneWindowManager not found");
+		} catch (NoSuchMethodError e2) {
+			XposedBridge.log("Method interceptKeyBeforeQueueing not found");
+		}
+	}
+
+	private void performAction(Context context, Handler handler, int keyCode, boolean longPressed, Object thisObject, String launchKey) {
+		if (longPressed && keyCode > 0) {
+			injectKey(context, handler, keyCode);
+		} else {
+			switch (keyCode) {
+			case KEYCODE_SWITCH_LAST_APP:
+				Utils.switchToLastApp(context, handler);
+				break;
+			case KEYCODE_TAKE_SCREENSHOT:
+				Utils.takeScreenshot(context, handler);
+				break;
+			case KEYCODE_SCREEN_OFF:
+				Utils.screenOff(context);
+				break;
+			case KEYCODE_POWER_MENU:
+				Utils.powerMenu(thisObject, handler);
+				break;
+			case KEYCODE_NOTIFICATION_PANEL:
+				Utils.expandNotificationsPanel(thisObject);
+				break;
+			case KEYCODE_QUICK_SETTINGS_PANEL:
+				Utils.expandSettingsPanel(thisObject);
+				break;
+			case KEYCODE_LAUNCH_APP:
+				Utils.launchApp(context, handler, launchKey);
+				break;
+			}
+		}
+
+		if (longPressed && keyCode != KEYCODE_NONE)
+			XposedHelpers.callMethod(thisObject, "performHapticFeedbackLw", new Class<?>[] { WindowState.class, int.class, boolean.class }, null,
+					HapticFeedbackConstants.LONG_PRESS, false);
+	}
+
+	/*
+	 * handle stock functions for long pressed event by injecting keycode
+	 * directly into input service
+	 */
+	private void injectKey(final Context context, Handler handler, final int keyCode) {
+		if (handler == null)
+			return;
+
+		mInjectedKeyCode = true;
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final long eventTime = SystemClock.uptimeMillis();
+					final InputManager inputManager = (InputManager) context.getSystemService(Context.INPUT_SERVICE);
+					XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 50, KeyEvent.ACTION_DOWN, keyCode, 0),
+							0);
+					XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 25, KeyEvent.ACTION_UP, keyCode, 0), 0);
+				} catch (Throwable t) {
+					XposedBridge.log(t);
+				}
+			}
+		});
 	}
 
 	@Override
@@ -121,7 +265,9 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 		mThemeIcons = new ThemeIcons();
 
+		// load preferences from module package
 		pref.reload();
+
 		boolean useTheme = pref.getBoolean("pref_usetheme", false);
 		boolean useAltMenu = pref.getBoolean("pref_use_alt_menu", false);
 		String themeId = pref.getString("pref_themeid", DEF_THEMEID);
@@ -192,6 +338,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				buttonsCount = orderList.length;
 				int leftMargin = pref.getInt("pref_left_margin", 0);
 				int rightMargin = pref.getInt("pref_right_margin", 0);
+				int searchKeycode = Integer.parseInt(pref.getString("pref_search_function", String.valueOf(KeyEvent.KEYCODE_SEARCH)));
 
 				mContext = liparam.view.getContext();
 				final Display defaultDisplay = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -258,7 +405,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							viewList.put(
 									"Search",
 									createButtonView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, "ic_sysbar_highlight", searchButtonDrawable,
-											KeyEvent.KEYCODE_SEARCH, "Search", true));
+											searchKeycode, "Search", true));
 						}
 
 						rot0NavButtons.removeAllViews();
@@ -362,7 +509,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							viewList.put(
 									"Search",
 									createButtonView(liparam, buttonWidth, LinearLayout.LayoutParams.FILL_PARENT, tabletMode ? "ic_sysbar_highlight"
-											: "ic_sysbar_highlight_land", searchButtonDrawable, KeyEvent.KEYCODE_SEARCH, "Search", true));
+											: "ic_sysbar_highlight_land", searchButtonDrawable, searchKeycode, "Search", true));
 						}
 
 						rot90NavButtons.removeAllViews();

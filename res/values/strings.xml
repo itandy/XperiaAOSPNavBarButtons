@@ -52,9 +52,33 @@
     <string name="title_navbar_width">NavBar width (Reboot required)</string>
     <string name="summ_navbar_width">NavBar width factor (50%-150%) (Landscape)</string>
     
+    <string name="title_search_function">Search button action (Reboot required)</string>
+    <string name="summ_search_function">Selected action for search button: %s</string>
+    <string name="summ_search_function2" formatted="false">Selected action for search button: %s (%s)</string>
+    
+    <string name="title_search_longpress_function">Search button long press action (Reboot required)</string>
+
     <string name="cat_buttons">Buttons</string>
     <string name="cat_layout">NavBar Layout</string>
     <string name="cat_others">Others</string>
     
     <string name="custom_button_images_found">%d custom button images found</string>
+    
+	<string name="text_none">None</string>
+    <string name="text_calculator">Calculator</string>
+    <string name="text_calendar">Calendar</string>
+    <string name="text_call">Call</string>
+    <string name="text_camera">Camera</string>
+    <string name="text_contacts">Contacts</string>
+    <string name="text_search">Search</string>
+    <string name="text_switch_lastapp">Switch to last app</string>
+    <string name="text_screenshot">Take screenshot</string>
+    <string name="text_screen_off">Screen off</string>
+    <string name="text_power_menu">Power menu</string>
+    <string name="text_notification_panel">Notification Panel</string>
+    <string name="text_quick_settings_panel">Quick Settings Panel</string>
+    <string name="text_launch_app">Launch app</string>
+    <string name="text_unknown">Unknown</string>
+    
+    <string name="msg_unknown_app">Unknown app</string>
 </resources>

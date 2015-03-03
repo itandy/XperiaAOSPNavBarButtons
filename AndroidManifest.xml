@@ -1,13 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gzplanet.xposed.xperianavbarbuttons"
-    android:versionCode="35"
-    android:versionName="3.5 (build 01212219)" >
+    android:versionCode="37"
+    android:versionName="3.7 (build 03032015)" >
 
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.REORDER_TASKS"/>
 
     <application
         android:allowBackup="true"
