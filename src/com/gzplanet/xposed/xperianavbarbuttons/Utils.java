@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -26,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -53,8 +55,7 @@ public class Utils {
 	private static ServiceConnection mScreenshotConnection;
 
 	public static int getScreenWidth(Context context) {
-		final Display defaultDisplay = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
-				.getDefaultDisplay();
+		final Display defaultDisplay = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 		final Point point = new Point();
 		defaultDisplay.getSize(point);
 		return point.x;
@@ -67,6 +68,19 @@ public class Utils {
 			return res.getDimensionPixelSize(resId);
 		else
 			return -1;
+	}
+
+	public static int getPackageResDimension(Context context, String resName, String resType, String pkgName) {
+		try {
+			Resources res = context.getPackageManager().getResourcesForApplication(XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
+			final int id = res.getIdentifier(resName, resType, pkgName);
+			if (id > 0)
+				return res.getDimensionPixelSize(id);
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return 0;
 	}
 
 	public static Bitmap decodeImageFromResource(Resources resources, int resId, int reqWidth, int reqHeight) {
@@ -88,8 +102,7 @@ public class Utils {
 		return bitmap;
 	}
 
-	private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight,
-			boolean cropToFit) {
+	private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight, boolean cropToFit) {
 		// Raw height and width of image
 		final int height = options.outHeight;
 		final int width = options.outWidth;
@@ -97,11 +110,9 @@ public class Utils {
 
 		if (height > reqHeight || width > reqWidth) {
 			if (cropToFit)
-				inSampleSize = Math.min((int) Math.floor((double) height / (double) reqHeight),
-						(int) Math.floor((double) width / (double) reqWidth));
+				inSampleSize = Math.min((int) Math.floor((double) height / (double) reqHeight), (int) Math.floor((double) width / (double) reqWidth));
 			else
-				inSampleSize = Math.max((int) Math.floor((double) height / (double) reqHeight),
-						(int) Math.floor((double) width / (double) reqWidth));
+				inSampleSize = Math.max((int) Math.floor((double) height / (double) reqHeight), (int) Math.floor((double) width / (double) reqWidth));
 
 			// adjust if final image will be smaller than required image
 			if (inSampleSize > 0)
@@ -137,8 +148,7 @@ public class Utils {
 	}
 
 	public static Bitmap getDrawableBitmap(Resources res, String resName) {
-		Bitmap bitmap = BitmapFactory.decodeResource(res,
-				res.getIdentifier(resName, "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
+		Bitmap bitmap = BitmapFactory.decodeResource(res, res.getIdentifier(resName, "drawable", XperiaNavBarButtons.CLASSNAME_SYSTEMUI));
 		if (bitmap != null)
 			bitmap.setHasAlpha(true);
 
@@ -148,8 +158,7 @@ public class Utils {
 	public static String getSystemUICacheFolder(Context context) {
 		String cacheFolder = null;
 		try {
-			cacheFolder = context.getExternalCacheDir().getAbsolutePath()
-					.replace(context.getPackageName(), XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
+			cacheFolder = context.getExternalCacheDir().getAbsolutePath().replace(context.getPackageName(), XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
 		} catch (Exception e) {
 		}
 
@@ -188,10 +197,10 @@ public class Utils {
 
 		source = new BitmapDrawable(res, bitmapResized);
 
-		if (bitmap != bitmapResized) {
-			bitmap.recycle();
-			bitmap = null;
-		}
+		// if (bitmap != bitmapResized) {
+		// bitmap.recycle();
+		// bitmap = null;
+		// }
 
 		return source;
 	}
@@ -318,9 +327,9 @@ public class Utils {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						XposedHelpers.callMethod(mPhoneWindowManager, "sendCloseSystemWindows",
-								SYSTEM_DIALOG_REASON_GLOBAL_ACTIONS);
-						XposedHelpers.callMethod(mPhoneWindowManager, "showGlobalActionsDialog");
+						XposedHelpers.callMethod(mPhoneWindowManager, "sendCloseSystemWindows", SYSTEM_DIALOG_REASON_GLOBAL_ACTIONS);
+						XposedHelpers.callMethod(mPhoneWindowManager, Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? "showGlobalActions"
+								: "showGlobalActionsDialog");
 					}
 				});
 			} catch (Throwable t) {
