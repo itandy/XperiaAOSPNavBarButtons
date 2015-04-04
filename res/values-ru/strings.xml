@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Xperia/AOSP NavBar Buttons</string>
+    <string name="navbar_preview">Предпросмотр NavBar</string>
+    <string name="available_themes">Доступные темы</string>
+    <string name="selected_theme">Выбранная тема</string>
+    <string name="available_colors">Доступные цвета</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="import_button_iamges">Кнопка импорта изображений</string>
+    <string name="changelog_full_title">История изменений</string>
+    <string name="changelog_title">Что нового</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">ещё</string>
+    <string name="title_show_recent">Показать Недавние</string>
+    <string name="summ_show_recent">Показать кнопку недавнее приложения</string>
+    <string name="title_show_menu">Показать Меню</string>
+    <string name="summ_show_menu">Показать Кнопку меню</string>
+    <string name="title_show_search">Показать Поиск</string>
+    <string name="summ_show_search">Показать Кнопку поиск</string>
+    <string name="title_reorder">Переупорядочить кнопки</string>
+    <string name="summ_reorder">Переупорядочить кнопки в панели навигации</string>
+    <string name="title_theme">Выберите тему</string>
+    <string name="summ_theme">Выберите тему для кнопок панели навигации</string>
+    <string name="title_use_alt_menu">Использовать альтернативную кнопку меню</string>
+    <string name="summ_use_alt_menu">Доступно только при выборе темы</string>
+    <string name="title_restart_systemui">Перезапустите SystemUI (Root обязателен)</string>
+    <string name="summ_restart_systemui">"Перезагрузка SysmteUI, сразу же применить изменения. 
+
+Если панель уведомлений или NavBar не будут правильно отображаться или любые иконки отсутствует, пожалуйста, перезагрузить устройство ."</string>
+    <string name="title_hints">Совет</string>
+    <string name="summ_hints">Как использовать пользовательские изображения кнопок</string>
+    <string name="title_left_margin">Левое / Верхнее поле</string>
+    <string name="summ_left_margin">Левое / Верхнее поле в пикселях</string>
+    <string name="title_right_margin">Правое / Нижнее поле</string>
+    <string name="summ_right_margin">Правое / Нижнее поле в пикселях</string>
+    <string name="title_navbar_height">Высота панели навигации (Требуется перезагрузка)</string>
+    <string name="summ_navbar_height" formatted="false">Высота панели навигации (50%-150%)</string>
+    <string name="title_navbar_height_land">Высота панели навигации (Требуется перезагрузка)</string>
+    <string name="summ_navbar_height_land" formatted="false">Высота панели навигации (50%-150%) (Tablet)</string>
+    <string name="title_navbar_width">Ширина панели навигации (Требуется перезагрузка)</string>
+    <string name="summ_navbar_width" formatted="false">Ширина панели навигации (50%-150%) (Landscape)</string>
+    <string name="title_search_function">"Нажатие кнопки поиска
+(требуется перезагрузка)"</string>
+    <string name="summ_search_function">Выбранное действие для кнопки поиска: %s</string>
+    <string name="summ_search_function2" formatted="false">Выбранное действие для кнопки поиска: %s (%s)</string>
+    <string name="title_search_longpress_function">"Удержание кнопки поиска
+(требуется перезагрузка)"</string>
+    <string name="cat_buttons">Кнопки</string>
+    <string name="cat_layout">Компоновка панели навигации</string>
+    <string name="cat_others">Остальное</string>
+    <string name="custom_button_images_found">%d найдено пользовательских изображений кнопок</string>
+    <string name="text_none">Ничего</string>
+    <string name="text_calculator">Калькулятор</string>
+    <string name="text_calendar">Календарь</string>
+    <string name="text_call">Звонки</string>
+    <string name="text_camera">Камера</string>
+    <string name="text_contacts">Контакты</string>
+    <string name="text_search">Поиск</string>
+    <string name="text_switch_lastapp">Переключить на последние запущенные приложения</string>
+    <string name="text_screenshot">Сделать скриншот</string>
+    <string name="text_screen_off">Выключить экран</string>
+    <string name="text_power_menu">Меню выключения</string>
+    <string name="text_notification_panel">Панель уведомлений</string>
+    <string name="text_quick_settings_panel">Панель быстрых настроек</string>
+    <string name="text_launch_app">Запустить приложение</string>
+    <string name="text_unknown">Unknown</string>
+    <string name="msg_unknown_app">Unknown app</string>
+</resources>
