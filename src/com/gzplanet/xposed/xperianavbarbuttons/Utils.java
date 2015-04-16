@@ -7,11 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -33,9 +35,11 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.PowerManager;
+import android.os.Process;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.view.Display;
+import android.view.HapticFeedbackConstants;
 import android.view.WindowManager;
 import android.widget.Toast;
 import de.robv.android.xposed.XposedBridge;
@@ -47,6 +51,7 @@ public class Utils {
 	private final static String CLASSNAME_TAKESCREENSHOTSERVICE = "com.android.systemui.screenshot.TakeScreenshotService";
 	private final static int MAX_LAST_APPS = 5;
 	private final static String SYSTEM_DIALOG_REASON_GLOBAL_ACTIONS = "globalactions";
+	private final static String CLASS_WINDOW_STATE = "android.view.WindowManagerPolicy$WindowState";
 
 	private static Context mContext;
 	private static Handler mHandler;
@@ -357,6 +362,24 @@ public class Utils {
 			});
 	}
 
+	public static void launchShortcut(Context context, Handler handler, final String launchKey) {
+		mContext = context;
+		if (handler != null)
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					Intent intent;
+					try {
+						intent = Intent.parseUri(launchKey, 0);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						mContext.startActivity(intent);
+					} catch (URISyntaxException e) {
+						Toast.makeText(mContext, R.string.msg_unknown_shortcut, Toast.LENGTH_SHORT).show();
+					}
+				}
+			});
+	}
+
 	public static void expandNotificationsPanel(Object phoneWindowManager) {
 		mPhoneWindowManager = phoneWindowManager;
 		try {
@@ -375,6 +398,68 @@ public class Utils {
 		} catch (Throwable t) {
 			XposedBridge.log("Error executing expandSettingsPanel(): " + t.getMessage());
 		}
+	}
+
+	public static void killForegroundApp(Context context, Handler handler, Object phoneWindowManager) {
+		mContext = context;
+		mPhoneWindowManager = phoneWindowManager;
+		if (handler == null)
+			return;
+
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final Intent intent = new Intent(Intent.ACTION_MAIN);
+					final PackageManager pm = mContext.getPackageManager();
+					String defaultHomePackage = PKG_DEFAULT_HOME;
+					intent.addCategory(Intent.CATEGORY_HOME);
+
+					final ResolveInfo res = pm.resolveActivity(intent, 0);
+					if (res.activityInfo != null && !res.activityInfo.packageName.equals("android")) {
+						defaultHomePackage = res.activityInfo.packageName;
+					}
+
+					ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+					List<RunningAppProcessInfo> apps = am.getRunningAppProcesses();
+
+					String targetKilled = null;
+					for (RunningAppProcessInfo appInfo : apps) {
+						int uid = appInfo.uid;
+						// Make sure it's a foreground user application (not
+						// system,
+						// root, phone, etc.)
+						if (uid >= Process.FIRST_APPLICATION_UID && uid <= Process.LAST_APPLICATION_UID
+								&& appInfo.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND && !appInfo.processName.equals(defaultHomePackage)) {
+							if (appInfo.pkgList != null && appInfo.pkgList.length > 0) {
+								for (String pkg : appInfo.pkgList)
+									XposedHelpers.callMethod(am, "forceStopPackage", pkg);
+							} else {
+								Process.killProcess(appInfo.pid);
+							}
+							targetKilled = appInfo.processName;
+							break;
+						}
+					}
+
+					if (targetKilled != null) {
+						try {
+							targetKilled = (String) pm.getApplicationLabel(pm.getApplicationInfo(targetKilled, 0));
+						} catch (PackageManager.NameNotFoundException nfe) {
+							//
+						}
+						Class<?>[] paramArgs = new Class<?>[3];
+						paramArgs[0] = XposedHelpers.findClass(CLASS_WINDOW_STATE, null);
+						paramArgs[1] = int.class;
+						paramArgs[2] = boolean.class;
+						XposedHelpers.callMethod(mPhoneWindowManager, "performHapticFeedbackLw", paramArgs, null,
+								HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING, true);
+					}
+				} catch (Exception e) {
+					XposedBridge.log(e);
+				}
+			}
+		});
 	}
 
 	public static List<ResolveInfo> getAppList(Context context) {

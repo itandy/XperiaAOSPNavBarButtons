@@ -112,5 +112,5 @@
 
     <com.gzplanet.xposed.xperianavbarbuttons.AppListPreference android:key="pref_search_function_apps" />
     <com.gzplanet.xposed.xperianavbarbuttons.AppListPreference android:key="pref_search_longpress_function_apps" />
-
+    
 </PreferenceScreen>

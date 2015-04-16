@@ -55,6 +55,7 @@
     <string name="title_search_function">Search button action (Reboot required)</string>
     <string name="summ_search_function">Selected action for search button: %s</string>
     <string name="summ_search_function2" formatted="false">Selected action for search button: %s (%s)</string>
+    <string name="summ_search_function3" formatted="false">Selected action for search button: %s (%s:%s)</string>
     
     <string name="title_search_longpress_function">Search button long press action (Reboot required)</string>
 
@@ -78,7 +79,10 @@
     <string name="text_notification_panel">Notification Panel</string>
     <string name="text_quick_settings_panel">Quick Settings Panel</string>
     <string name="text_launch_app">Launch app</string>
+    <string name="text_kill_app">Kill foreground app</string>
+    <string name="text_launch_shortcut">Launch shortcut</string>
     <string name="text_unknown">Unknown</string>
     
     <string name="msg_unknown_app">Unknown app</string>
+    <string name="msg_unknown_shortcut">Unknown shortcut</string>
 </resources>

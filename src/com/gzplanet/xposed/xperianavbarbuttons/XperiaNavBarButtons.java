@@ -63,6 +63,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 	final static int KEYCODE_NOTIFICATION_PANEL = -6;
 	final static int KEYCODE_QUICK_SETTINGS_PANEL = -7;
 	final static int KEYCODE_LAUNCH_APP = -8;
+	final static int KEYCODE_KILL_APP = -9;
+	final static int KEYCODE_LAUNCH_SHORTCUT = -10;
 
 	final static int NAVIGATION_HINT_IME_SHOWN = 1 << 1;
 	final static String DEF_BUTTONS_ORDER_LIST = "Home,Menu,Recent,Back,Search";
@@ -84,6 +86,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 	static String mSearchLongPressFuncApp = null;
 	static boolean mSearchKeyLongPressed = false;
 	static boolean mInjectedKeyCode = false;
+	static String mSearchFuncShortcut = null;
+	static String mSearchLongPressFuncShortcut = null;
 
 	Map<String, Bitmap> mStockButtons = new HashMap<String, Bitmap>();
 
@@ -100,6 +104,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		mKeyCodeLongPress = Integer.parseInt(pref.getString("pref_search_longpress_function", String.valueOf(KEYCODE_NONE)));
 		mSearchFuncApp = pref.getString("pref_search_function_apps", null);
 		mSearchLongPressFuncApp = pref.getString("pref_search_longpress_function_apps", null);
+		mSearchFuncShortcut = pref.getString("pref_search_function_shortcut", null);
+		mSearchLongPressFuncShortcut = pref.getString("pref_search_longpress_function_shortcut", null);
 
 		// handle custom navbar height
 		try {
@@ -198,14 +204,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						// handle long pressed
 						mSearchKeyLongPressed = true;
 						if (mKeyCodeLongPress != KEYCODE_NONE) {
-							performAction(context, handler, mKeyCodeLongPress, true, param.thisObject, mSearchLongPressFuncApp);
+							performAction(context, handler, mKeyCodeLongPress, true, param.thisObject, mSearchLongPressFuncApp, mSearchLongPressFuncShortcut);
 							handled = true;
 						}
 					}
 				} else {
 					// handle single tap
 					if (!mSearchKeyLongPressed && keyCode < KEYCODE_NONE) {
-						performAction(context, handler, keyCode, false, param.thisObject, mSearchFuncApp);
+						performAction(context, handler, keyCode, false, param.thisObject, mSearchFuncApp, mSearchFuncShortcut);
 						handled = true;
 					}
 					if (!mInjectedKeyCode)
@@ -219,7 +225,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		}
 	}
 
-	private void performAction(Context context, Handler handler, int keyCode, boolean longPressed, Object thisObject, String launchKey) {
+	private void performAction(Context context, Handler handler, int keyCode, boolean longPressed, Object thisObject, String app, String shortcut) {
 		if (longPressed && keyCode > 0) {
 			injectKey(context, handler, keyCode);
 		} else {
@@ -243,7 +249,13 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				Utils.expandSettingsPanel(thisObject);
 				break;
 			case KEYCODE_LAUNCH_APP:
-				Utils.launchApp(context, handler, launchKey);
+				Utils.launchApp(context, handler, app);
+				break;
+			case KEYCODE_KILL_APP:
+				Utils.killForegroundApp(context, handler, thisObject);
+				break;
+			case KEYCODE_LAUNCH_SHORTCUT:
+				Utils.launchShortcut(context, handler, shortcut);
 				break;
 			}
 		}

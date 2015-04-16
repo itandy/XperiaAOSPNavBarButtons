@@ -16,6 +16,8 @@
         <item>@string/text_notification_panel</item>
         <item>@string/text_quick_settings_panel</item>
         <item>@string/text_launch_app</item>
+        <item>@string/text_kill_app</item>
+        <item>@string/text_launch_shortcut</item>
     </string-array>
     <string-array name="array_search_func_keycode">
         <item>-1</item>
@@ -32,6 +34,8 @@
         <item>-6</item>
         <item>-7</item>
         <item>-8</item>
+        <item>-9</item>
+        <item>-10</item>
     </string-array>
 
 </resources>

@@ -43,6 +43,7 @@
 (требуется перезагрузка)"</string>
     <string name="summ_search_function">Выбранное действие для кнопки поиска: %s</string>
     <string name="summ_search_function2" formatted="false">Выбранное действие для кнопки поиска: %s (%s)</string>
+    <string name="summ_search_function3" formatted="false">Выбранное действие для кнопки поиска: %s (%s:%s)</string>
     <string name="title_search_longpress_function">"Удержание кнопки поиска
 (требуется перезагрузка)"</string>
     <string name="cat_buttons">Кнопки</string>
@@ -63,6 +64,10 @@
     <string name="text_notification_panel">Панель уведомлений</string>
     <string name="text_quick_settings_panel">Панель быстрых настроек</string>
     <string name="text_launch_app">Запустить приложение</string>
-    <string name="text_unknown">Unknown</string>
-    <string name="msg_unknown_app">Unknown app</string>
+    <string name="text_kill_app">Завершить текущее приложение</string>
+    <string name="text_launch_shortcut">запустить ярлык приложения</string>
+    <string name="text_unknown">неизвестный</string>
+    
+    <string name="msg_unknown_app">неизвестное приложение</string>
+    <string name="msg_unknown_shortcut">неизвестно ярлык приложения</string>
 </resources>

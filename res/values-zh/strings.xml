@@ -54,6 +54,7 @@
     <string name="title_search_function">搜尋鍵功能 (設定後需重啟)</string>
     <string name="summ_search_function">己設定搜尋鍵功能: %s</string>
     <string name="summ_search_function2" formatted="false">己設定搜尋鍵功能: %s (%s)</string>
+    <string name="summ_search_function3" formatted="false">己設定搜尋鍵功能: %s (%s:%s)</string>
     
     <string name="title_search_longpress_function">搜尋鍵長按功能 (設定後需重啟)</string>
     
@@ -77,6 +78,10 @@
     <string name="text_notification_panel">展開通知面板</string>
     <string name="text_quick_settings_panel">展開快速設定面板</string>
     <string name="text_launch_app">啟動應用程式</string>
+    <string name="text_kill_app">結束當前應用程式</string>
+    <string name="text_launch_shortcut">啟動應用程式捷徑</string>
+    <string name="text_unknown">不明</string>
     
     <string name="msg_unknown_app">啟動應用程式出錯</string>
+    <string name="msg_unknown_shortcut">不明啟動應用程式捷徑</string>
 </resources>
