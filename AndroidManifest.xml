@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gzplanet.xposed.xperianavbarbuttons"
-    android:versionCode="42"
-    android:versionName="4.2 (build 04152312)" >
+    android:versionCode="43"
+    android:versionName="4.3 (build 05301651)" >
 
     <uses-sdk
         android:minSdkVersion="14"
