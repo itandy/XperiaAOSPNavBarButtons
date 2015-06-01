@@ -319,7 +319,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		mStockButtons.put("ic_sysbar_home", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_home"));
 		mStockButtons.put("ic_sysbar_menu", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_menu"));
 		mStockButtons.put("ic_sysbar_recent", Utils.getDrawableBitmap(resparam.res, "ic_sysbar_recent"));
-		
+
 		// replace NavBar icons drawables, for theme only
 		if (useTheme) {
 			if (mThemeIcons.getThemeExample(themeId) == -1) {
@@ -500,8 +500,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							imeView.setVisibility(View.INVISIBLE);
 							imeView.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth : extraKeyWidth, FrameLayout.LayoutParams.MATCH_PARENT));
 							imeView.setPadding(0, 0, 0, 0);
-//							imeView.setScaleType(ScaleType.FIT_CENTER);
-							imeView.setScaleType(ScaleType.CENTER);
+							// imeView.setScaleType(ScaleType.FIT_CENTER);
+							imeView.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 							menuParent.addView(imeView);
 						}
 
@@ -530,8 +530,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							if (view != null) {
 								view.setVisibility(View.VISIBLE);
 								view.setPadding(0, 0, 0, 0);
-//								view.setScaleType(ScaleType.FIT_CENTER);
-								view.setScaleType(ScaleType.CENTER);
+								// view.setScaleType(ScaleType.FIT_CENTER);
+								view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 
 								if (orderList[i].equals("Menu") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 									view.setLayoutParams(new FrameLayout.LayoutParams(buttonWidth, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -658,8 +658,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								imeView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, mShowMenu ? buttonWidth
 										: extraKeyWidth));
 							imeView.setPadding(0, 0, 0, 0);
-//							imeView.setScaleType(ScaleType.FIT_CENTER);
-							imeView.setScaleType(ScaleType.CENTER);
+							// imeView.setScaleType(ScaleType.FIT_CENTER);
+							imeView.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 							menuParent.addView(imeView);
 						}
 
@@ -692,8 +692,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								if (view != null) {
 									view.setVisibility(View.VISIBLE);
 									view.setPadding(0, 0, 0, 0);
-//									view.setScaleType(ScaleType.FIT_CENTER);
-									view.setScaleType(ScaleType.CENTER);
+									// view.setScaleType(ScaleType.FIT_CENTER);
+									view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 
 									if (orderList[i].equals("Menu") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 										view.setLayoutParams(new FrameLayout.LayoutParams(buttonWidth, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -728,8 +728,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								if (view != null) {
 									view.setVisibility(View.VISIBLE);
 									view.setPadding(0, 0, 0, 0);
-//									view.setScaleType(ScaleType.FIT_CENTER);
-									view.setScaleType(ScaleType.CENTER);
+									// view.setScaleType(ScaleType.FIT_CENTER);
+									view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 
 									if (orderList[i].equals("Menu") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 										view.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, buttonWidth));
