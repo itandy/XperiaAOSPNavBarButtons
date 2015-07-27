@@ -334,6 +334,15 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 					replaceCustomButton(resparam.res, "ic_sysbar_menu_land", "Menu", useAltMenu, true);
 					replaceCustomButton(resparam.res, "ic_sysbar_recent", "Recent", false, false);
 					replaceCustomButton(resparam.res, "ic_sysbar_recent_land", "Recent", false, true);
+
+					// HTC specific resources
+					try {
+						replaceCustomButton(resparam.res, "navigation_icon_back", "Back", false, false);
+						replaceCustomButton(resparam.res, "navigation_icon_home", "Home", false, false);
+						replaceCustomButton(resparam.res, "navigation_icon_menu", "Menu", useAltMenu, false);
+						replaceCustomButton(resparam.res, "navigation_icon_recent_apps", "Recent", false, false);
+					} catch (Exception e) {
+					}
 				}
 			} else {
 				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back",
@@ -354,6 +363,19 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
 				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent_land",
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, true)));
+
+				// HTC specific resources
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "navigation_icon_back",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, false)));
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "navigation_icon_home",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, false)));
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "navigation_icon_menu",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, false)));
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "navigation_icon_recent_apps",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
+				} catch (Exception e) {
+				}
 			}
 		}
 
