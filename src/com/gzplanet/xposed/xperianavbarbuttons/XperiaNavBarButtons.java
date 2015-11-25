@@ -374,20 +374,36 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, false)));
 				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_ime",
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", true, false)));
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_land",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, true)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_land",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, true)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_back_land not found");
+				}
 				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home",
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, false)));
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home_land",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, true)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home_land",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, true)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_home_land not found");
+				}
 				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu",
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, false)));
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu_land",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, true)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu_land",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, true)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_menu_land not found");
+				}
 				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent",
 						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent_land",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, true)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent_land",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, true)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_recent_land not found");
+				}
 
 				// HTC specific resources
 				try {
