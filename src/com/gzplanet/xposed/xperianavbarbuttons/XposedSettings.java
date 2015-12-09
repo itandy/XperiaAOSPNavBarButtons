@@ -54,6 +54,7 @@ public class XposedSettings extends PreferenceActivity {
 	boolean mShowMenu;
 	boolean mShowSearch;
 	boolean mShowRecent;
+	boolean mShowSeparator;
 	String mThemeId;
 	String mThemeColor;
 	boolean mUseTheme;
@@ -64,6 +65,7 @@ public class XposedSettings extends PreferenceActivity {
 	int mRightMargin;
 	int mNavBarHeight;
 	int mExtraPadding;
+	int mSeparatorWidth;
 
 	String mSearchKeycode;
 	String mSearchLongPressKeycode;
@@ -87,11 +89,13 @@ public class XposedSettings extends PreferenceActivity {
 	CheckBoxPreference mPrefShowRecent;
 	CheckBoxPreference mPrefShowMenu;
 	CheckBoxPreference mPrefShowSearch;
+	CheckBoxPreference mPrefShowSeparator;
 	Preference mPrefRestartSystemUI;
 	Preference mPrefReorder;
 	Preference mPrefTheme;
 	CheckBoxPreference mPrefUseAltMenu;
 	Preference mPrefHints;
+	Preference mPrefSeparatorWidth;
 	Preference mPrefLeftMargin;
 	Preference mPrefRightMargin;
 	Preference mPrefNavBarHeight;
@@ -104,7 +108,7 @@ public class XposedSettings extends PreferenceActivity {
 	ThemeIcons mThemeIcons = new ThemeIcons();
 	CustomButtons mCustomButtons;
 
-	static int[] mIconId = { R.id.iv1, R.id.iv2, R.id.iv3, R.id.iv4, R.id.iv5 };
+	static int[] mIconId = { R.id.iv1, R.id.iv2, R.id.iv3, R.id.iv4, R.id.iv5, R.id.iv6 };
 
 	// async task to load installed app list
 	private class LoadInstalledAppTask extends AsyncTask<Void, Void, Void> {
@@ -142,10 +146,12 @@ public class XposedSettings extends PreferenceActivity {
 				mAppActivity.add(apps.get(i).loadLabel(pm).toString());
 				mAppPackageName.add(apps.get(i).activityInfo.packageName);
 				mAppComponentName.add(apps.get(i).activityInfo.name);
-				mAppLaunchKey.add(apps.get(i).activityInfo.packageName + DELIMITER_LAUNCHKEY + apps.get(i).activityInfo.name);
+				mAppLaunchKey.add(apps.get(i).activityInfo.packageName + DELIMITER_LAUNCHKEY
+						+ apps.get(i).activityInfo.name);
 				// resize app icon because some apps are loaded with over-sized
 				// icons
-				mAppActivityIcon.add(Utils.resizeDrawable(mContext.getResources(), apps.get(i).activityInfo.applicationInfo.loadIcon(pm), width, width));
+				mAppActivityIcon.add(Utils.resizeDrawable(mContext.getResources(),
+						apps.get(i).activityInfo.applicationInfo.loadIcon(pm), width, width));
 			}
 
 			return null;
@@ -158,8 +164,10 @@ public class XposedSettings extends PreferenceActivity {
 			mPrefSearchButtonFuncApps.setEntryValues(mAppLaunchKey.toArray(new CharSequence[mAppLaunchKey.size()]));
 			mPrefSearchButtonFuncApps.setEntryIcons(mAppActivityIcon.toArray(new Drawable[mAppActivityIcon.size()]));
 			mPrefSearchLongPressButtonFuncApps.setEntries(mAppActivity.toArray(new CharSequence[mAppActivity.size()]));
-			mPrefSearchLongPressButtonFuncApps.setEntryValues(mAppLaunchKey.toArray(new CharSequence[mAppLaunchKey.size()]));
-			mPrefSearchLongPressButtonFuncApps.setEntryIcons(mAppActivityIcon.toArray(new Drawable[mAppActivityIcon.size()]));
+			mPrefSearchLongPressButtonFuncApps.setEntryValues(mAppLaunchKey.toArray(new CharSequence[mAppLaunchKey
+					.size()]));
+			mPrefSearchLongPressButtonFuncApps.setEntryIcons(mAppActivityIcon.toArray(new Drawable[mAppActivityIcon
+					.size()]));
 
 			// display preference summary
 			mPrefSearchButtonFunc.setSummary(getSearchFuncSummary(mSearchKeycode, false));
@@ -194,18 +202,21 @@ public class XposedSettings extends PreferenceActivity {
 
 		// for Lollipop, add extra padding for IME switcher
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-			mExtraPadding = Utils.getPackageResDimension(this, "navigation_extra_key_width", "dimen", XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
+			mExtraPadding = Utils.getPackageResDimension(this, "navigation_extra_key_width", "dimen",
+					XperiaNavBarButtons.CLASSNAME_SYSTEMUI);
 		else
 			mExtraPadding = 0;
 
 		mPrefShowRecent = (CheckBoxPreference) findPreference("pref_show_recent");
 		mPrefShowMenu = (CheckBoxPreference) findPreference("pref_show_menu");
 		mPrefShowSearch = (CheckBoxPreference) findPreference("pref_show_search");
+		mPrefShowSeparator = (CheckBoxPreference) findPreference("pref_show_separator");
 		mPrefReorder = (Preference) findPreference("pref_reorder");
 		mPrefTheme = (Preference) findPreference("pref_theme");
 		mPrefRestartSystemUI = (Preference) findPreference("pref_restart_systemui");
 		mPrefUseAltMenu = (CheckBoxPreference) findPreference("pref_use_alt_menu");
 		mPrefHints = (Preference) findPreference("pref_hints");
+		mPrefSeparatorWidth = (Preference) findPreference("pref_separator_width");
 		mPrefLeftMargin = (Preference) findPreference("pref_left_margin");
 		mPrefRightMargin = (Preference) findPreference("pref_right_margin");
 		mPrefNavBarHeight = (Preference) findPreference("pref_navbar_height");
@@ -224,6 +235,9 @@ public class XposedSettings extends PreferenceActivity {
 			mButtonsCount++;
 		mShowRecent = mSettings.isShowRecent();
 		if (mShowRecent)
+			mButtonsCount++;
+		mShowSeparator = mSettings.isShowSeparator();
+		if (mShowSeparator)
 			mButtonsCount++;
 
 		mCacheFolder = Utils.getSystemUICacheFolder(this);
@@ -247,7 +261,8 @@ public class XposedSettings extends PreferenceActivity {
 					mButtonsCount--;
 				mShowRecent = (Boolean) newValue;
 				mSettings.setShowRecent(mShowRecent);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -262,7 +277,8 @@ public class XposedSettings extends PreferenceActivity {
 					mButtonsCount--;
 				mShowMenu = (Boolean) newValue;
 				mSettings.setShowMenu(mShowMenu);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -277,10 +293,27 @@ public class XposedSettings extends PreferenceActivity {
 					mButtonsCount--;
 				mShowSearch = (Boolean) newValue;
 				mSettings.setShowSearch(mShowSearch);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_order", mSettings.getOrderListString()).commit();
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
 				updatePreviewPanel();
 				mPrefSearchButtonFunc.setEnabled(mShowSearch);
 				mPrefSearchButtonLongPressFunc.setEnabled(mShowSearch);
+				return true;
+			}
+		});
+
+		mPrefShowSeparator.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				if ((Boolean) newValue)
+					mButtonsCount++;
+				else
+					mButtonsCount--;
+				mShowSeparator = (Boolean) newValue;
+				mSettings.setShowSeparator(mShowSeparator);
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_order", mSettings.getOrderListString()).commit();
+				updatePreviewPanel();
 				return true;
 			}
 		});
@@ -313,7 +346,8 @@ public class XposedSettings extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				mUseAltMenu = (Boolean) newValue;
-				getPreferenceManager().getSharedPreferences().edit().putBoolean("pref_use_alt_menu", mUseAltMenu).commit();
+				getPreferenceManager().getSharedPreferences().edit().putBoolean("pref_use_alt_menu", mUseAltMenu)
+						.commit();
 				updatePreviewPanel();
 				return true;
 			}
@@ -340,7 +374,8 @@ public class XposedSettings extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				mSearchFuncApp = newValue.toString();
-				mPrefSearchButtonFunc.setSummary(getSearchFuncSummary(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_APP), false));
+				mPrefSearchButtonFunc.setSummary(getSearchFuncSummary(
+						String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_APP), false));
 				return true;
 			}
 		});
@@ -367,11 +402,23 @@ public class XposedSettings extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				mSearchLongPressFuncApp = newValue.toString();
-				mPrefSearchButtonLongPressFunc.setSummary(getSearchFuncSummary(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_APP), true));
+				mPrefSearchButtonLongPressFunc.setSummary(getSearchFuncSummary(
+						String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_APP), true));
 				return true;
 			}
 		});
 		getPreferenceScreen().removePreference(mPrefSearchLongPressButtonFuncApps);
+
+		mPrefSeparatorWidth.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				mSeparatorWidth = (Integer) newValue;
+				updatePreviewPanel();
+				return true;
+			}
+
+		});
 
 		mPrefLeftMargin.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -416,7 +463,8 @@ public class XposedSettings extends PreferenceActivity {
 
 					final String pkgName = XposedSettings.this.getPackageName();
 					final String pkgFilename = pkgName + "_preferences";
-					final File prefFile = new File(Environment.getDataDirectory(), "data/" + pkgName + "/shared_prefs/" + pkgFilename + ".xml");
+					final File prefFile = new File(Environment.getDataDirectory(), "data/" + pkgName + "/shared_prefs/"
+							+ pkgFilename + ".xml");
 					Log.d("XposedSettings", prefFile.getAbsolutePath());
 
 					// make shared preference world-readable
@@ -498,8 +546,10 @@ public class XposedSettings extends PreferenceActivity {
 				intent.putExtra("shortcutName", name);
 				intent.putExtra("shortcutApp", mSearchFuncShortcutApp);
 				mSearchFuncShortcut = intent.toUri(0);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_search_function_shortcut", mSearchFuncShortcut).commit();
-				mPrefSearchButtonFunc.setSummary(getSearchFuncSummary(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT), false));
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_search_function_shortcut", mSearchFuncShortcut).commit();
+				mPrefSearchButtonFunc.setSummary(getSearchFuncSummary(
+						String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT), false));
 				break;
 			case RESULT_CREATE_LP_SHORTCUT:
 				intent = (Intent) data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
@@ -507,9 +557,10 @@ public class XposedSettings extends PreferenceActivity {
 				intent.putExtra("shortcutName", name);
 				intent.putExtra("shortcutApp", mSearchLongPressFuncShortcutApp);
 				mSearchLongPressFuncShortcut = intent.toUri(0);
-				getPreferenceManager().getSharedPreferences().edit().putString("pref_search_longpress_function_shortcut", mSearchLongPressFuncShortcut)
-						.commit();
-				mPrefSearchButtonLongPressFunc.setSummary(getSearchFuncSummary(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT), true));
+				getPreferenceManager().getSharedPreferences().edit()
+						.putString("pref_search_longpress_function_shortcut", mSearchLongPressFuncShortcut).commit();
+				mPrefSearchButtonLongPressFunc.setSummary(getSearchFuncSummary(
+						String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT), true));
 				break;
 			case RESULT_PICK_SHORTCUT:
 				ri = getPackageManager().resolveActivity(data, 0);
@@ -529,8 +580,12 @@ public class XposedSettings extends PreferenceActivity {
 
 	private void updatePreviewPanel() {
 		int extraPadding = mShowMenu ? 0 : mExtraPadding;
+		int separatorWidth = Math.round((float) mScreenWidth * (float) mSeparatorWidth / 100);
+		int actualButtonsCount = mShowSeparator ? mButtonsCount - 1 : mButtonsCount;
 
-		mButtonWidth = Math.round((float) (mScreenWidth - mLeftMargin - mRightMargin - extraPadding * 2) / (float) mButtonsCount);
+		mButtonWidth = Math
+				.round((float) (mScreenWidth - mLeftMargin - mRightMargin - extraPadding * 2 - separatorWidth)
+						/ (float) actualButtonsCount);
 
 		// get default navbar height
 		int navBarHeight = (int) Utils.getNavBarHeight(getResources()) * mNavBarHeight / 100;
@@ -540,36 +595,46 @@ public class XposedSettings extends PreferenceActivity {
 			panel.getLayoutParams().height = navBarHeight;
 
 		ImageView leftMargin = (ImageView) panel.findViewById(R.id.left_margin);
-		leftMargin.setLayoutParams(new LinearLayout.LayoutParams(mLeftMargin + extraPadding, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+		leftMargin.setLayoutParams(new LinearLayout.LayoutParams(mLeftMargin + extraPadding,
+				LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
 
 		ImageView rightMargin = (ImageView) panel.findViewById(R.id.right_margin);
-		rightMargin.setLayoutParams(new LinearLayout.LayoutParams(mRightMargin + extraPadding, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+		rightMargin.setLayoutParams(new LinearLayout.LayoutParams(mRightMargin + extraPadding,
+				LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < mIconId.length; i++) {
 			ImageView iv = (ImageView) panel.findViewById(mIconId[i]);
 			if (i < mButtonsCount) {
-				boolean useAlt = false;
-
-				iv.setLayoutParams(new LinearLayout.LayoutParams(mButtonWidth, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
-				if ("Menu".equals(mSettings.getButtonName(i)))
-					useAlt = mUseAltMenu;
-
-				Drawable drawable = null;
-				if (mUseTheme) {
-					int buttonResId = mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i), useAlt, false);
-					if (buttonResId != -1)
-						drawable = getResources().getDrawable(buttonResId);
-					else {
-						Bitmap bitmap = mCustomButtons.getBitmap(mSettings.getButtonName(i), useAlt, false);
-						if (bitmap == null)
-							drawable = mSettings.getButtonDrawable(i);
-						else
-							drawable = new BitmapDrawable(getResources(), bitmap);
-					}
+				if ("Separator".equals(mSettings.getButtonName(i))) {
+					iv.setLayoutParams(new LinearLayout.LayoutParams(separatorWidth,
+							LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+					iv.setImageDrawable(null);
 				} else {
-					drawable = mSettings.getButtonDrawable(i);
+					boolean useAlt = false;
+
+					iv.setLayoutParams(new LinearLayout.LayoutParams(mButtonWidth,
+							LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+					if ("Menu".equals(mSettings.getButtonName(i)))
+						useAlt = mUseAltMenu;
+
+					Drawable drawable = null;
+					if (mUseTheme) {
+						int buttonResId = mThemeIcons.getIconResId(mThemeId, mThemeColor, mSettings.getButtonName(i),
+								useAlt, false);
+						if (buttonResId != -1)
+							drawable = getResources().getDrawable(buttonResId);
+						else {
+							Bitmap bitmap = mCustomButtons.getBitmap(mSettings.getButtonName(i), useAlt, false);
+							if (bitmap == null)
+								drawable = mSettings.getButtonDrawable(i);
+							else
+								drawable = new BitmapDrawable(getResources(), bitmap);
+						}
+					} else {
+						drawable = mSettings.getButtonDrawable(i);
+					}
+					iv.setImageDrawable(drawable);
 				}
-				iv.setImageDrawable(drawable);
 				iv.setVisibility(View.VISIBLE);
 			} else {
 				iv.setVisibility(View.GONE);
@@ -602,6 +667,8 @@ public class XposedSettings extends PreferenceActivity {
 		mSearchLongPressKeycode = pref.getString("pref_search_longpress_function", "-1");
 		mSearchFuncApp = pref.getString("pref_search_function_apps", null);
 		mSearchLongPressFuncApp = pref.getString("pref_search_longpress_function_apps", null);
+
+		mSeparatorWidth = pref.getInt("pref_separator_width", 0);
 	}
 
 	// store necesary info for user define theme to work
@@ -626,8 +693,9 @@ public class XposedSettings extends PreferenceActivity {
 
 			int pos = mAppComponentName.indexOf(component);
 			String activityName = (pos >= 0) ? mAppActivity.get(pos) : getResources().getString(R.string.text_unknown);
-			return String.format(getResources().getString(R.string.summ_search_function2),
-					mSearchFuncArray.get(mSearchKeycodeValues.indexOf(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_APP))), activityName);
+			return String.format(getResources().getString(R.string.summ_search_function2), mSearchFuncArray
+					.get(mSearchKeycodeValues.indexOf(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_APP))),
+					activityName);
 		} else if (Integer.valueOf(keyCode) == XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT) {
 			String name = null;
 			String app = null;
@@ -642,9 +710,11 @@ public class XposedSettings extends PreferenceActivity {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-			return String.format(getResources().getString(R.string.summ_search_function3),
-					mSearchFuncArray.get(mSearchKeycodeValues.indexOf(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT))), app, name);
+			return String.format(getResources().getString(R.string.summ_search_function3), mSearchFuncArray
+					.get(mSearchKeycodeValues.indexOf(String.valueOf(XperiaNavBarButtons.KEYCODE_LAUNCH_SHORTCUT))),
+					app, name);
 		} else
-			return String.format(getResources().getString(R.string.summ_search_function), mSearchFuncArray.get(mSearchKeycodeValues.indexOf(keyCode)));
+			return String.format(getResources().getString(R.string.summ_search_function),
+					mSearchFuncArray.get(mSearchKeycodeValues.indexOf(keyCode)));
 	}
 }

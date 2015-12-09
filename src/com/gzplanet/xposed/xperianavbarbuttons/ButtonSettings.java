@@ -19,6 +19,7 @@ public class ButtonSettings {
 	private boolean mShowMenu = false;
 	private boolean mShowSearch = false;
 	private boolean mShowRecent = false;
+	private boolean mShowSeparator = false;
 	private ArrayList<String> mOrder = new ArrayList<String>();
 	private Map<String, Drawable> mStockButtons = new HashMap<String, Drawable>();
 
@@ -37,7 +38,8 @@ public class ButtonSettings {
 
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			DisplayMetrics metrics = resSystemUI.getDisplayMetrics();
-			options.inDensity = 240;
+//			options.inDensity = 240;
+			options.inDensity = metrics.densityDpi;
 			options.inTargetDensity = metrics.densityDpi;
 
 			mStockButtons.put("Home", getStockButtonDrawable(resSystemUI, "ic_sysbar_home", cacheFolder, options));
@@ -57,6 +59,7 @@ public class ButtonSettings {
 			mShowMenu = true;
 			mShowSearch = true;
 			mShowRecent = true;
+			mShowSeparator = false;
 		} else {
 			String[] array = orderList.split(",");
 			for (int i = 0; i < array.length; i++) {
@@ -68,6 +71,8 @@ public class ButtonSettings {
 					mShowSearch = true;
 				if ("Recent".equals(array[i]))
 					mShowRecent = true;
+				if ("Separator".equals(array[i]))
+					mShowSeparator = true;
 			}
 		}
 	}
@@ -106,6 +111,18 @@ public class ButtonSettings {
 			addButton("Search");
 		else
 			removeButton("Search");
+	}
+
+	public boolean isShowSeparator() {
+		return mShowSeparator;
+	}
+
+	public void setShowSeparator(boolean showSeparator) {
+		mShowSeparator = showSeparator;
+		if (mShowSeparator)
+			addButton("Separator");
+		else
+			removeButton("Separator");
 	}
 
 	private void removeButton(String button) {

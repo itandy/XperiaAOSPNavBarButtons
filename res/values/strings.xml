@@ -85,4 +85,10 @@
     
     <string name="msg_unknown_app">Unknown app</string>
     <string name="msg_unknown_shortcut">Unknown shortcut</string>
+
+    <string name="title_show_separator">Show Separator</string>
+    <string name="summ_show_separator">Show Separator (transparent placeholder)</string>
+    <string name="title_separator_width">Separator width</string>
+    <string name="summ_separator_width">Separator width (0%-90%)</string>
+    
 </resources>

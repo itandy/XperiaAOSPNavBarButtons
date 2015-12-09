@@ -70,4 +70,10 @@
     
     <string name="msg_unknown_app">неизвестное приложение</string>
     <string name="msg_unknown_shortcut">неизвестно ярлык приложения</string>
+
+    <string name="title_show_separator">Показать сепаратор</string>
+    <string name="summ_show_separator">Показать сепаратор (прозрачный заполнитель)</string>
+    <string name="title_separator_width">ширина сепаратор</string>
+    <string name="summ_separator_width">ширина сепаратор (0%-90%)</string>
+
 </resources>

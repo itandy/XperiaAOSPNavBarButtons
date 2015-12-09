@@ -18,7 +18,12 @@
             android:key="pref_show_search"
             android:summary="@string/summ_show_search"
             android:title="@string/title_show_search" />
-
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_show_separator"
+            android:summary="@string/summ_show_separator"
+            android:title="@string/title_show_separator" />
+        
         <Preference
             android:key="pref_reorder"
             android:summary="@string/summ_reorder"
@@ -48,6 +53,17 @@
             android:title="@string/title_search_longpress_function" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/cat_layout" >
+        <com.robobunny.SeekBarPreference
+            android:defaultValue="0"
+            android:key="pref_separator_width"
+            android:max="90"
+            android:summary="@string/summ_separator_width"
+            android:title="@string/title_separator_width"
+            android:dependency="pref_show_separator"
+            robobunny:interval="1"
+            robobunny:min="0"
+            robobunny:unitsLeft=""
+            robobunny:unitsRight="%" />
         <com.robobunny.SeekBarPreference
             android:defaultValue="0"
             android:key="pref_left_margin"

@@ -84,4 +84,10 @@
     
     <string name="msg_unknown_app">启动应用程式出错</string>
     <string name="msg_unknown_shortcut">不明启动应用程式捷径</string>
+
+    <string name="title_show_separator">显示分隔</string>
+    <string name="summ_show_separator">显示分隔 (透明显示)</string>
+    <string name="title_separator_width">分隔宽度</string>
+    <string name="summ_separator_width">分隔宽度比  (0%-90%)</string>
+
 </resources>
