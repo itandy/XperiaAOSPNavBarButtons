@@ -580,7 +580,7 @@ public class XposedSettings extends PreferenceActivity {
 
 	private void updatePreviewPanel() {
 		int extraPadding = mShowMenu ? 0 : mExtraPadding;
-		int separatorWidth = Math.round((float) mScreenWidth * (float) mSeparatorWidth / 100);
+		int separatorWidth = mShowSeparator ? Math.round((float) mScreenWidth * (float) mSeparatorWidth / 100) : 0;
 		int actualButtonsCount = mShowSeparator ? mButtonsCount - 1 : mButtonsCount;
 
 		mButtonWidth = Math

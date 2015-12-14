@@ -54,6 +54,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 	final static String CLASSNAME_NAVIGATIONBARVIEW = "com.android.systemui.statusbar.phone.NavigationBarView";
 	final static String CLASSNAME_PHONEWINDOWMANAGER = "com.android.internal.policy.impl.PhoneWindowManager";
 	final static String CLASSNAME_PHONEWINDOWMANAGER_MM = "com.android.server.policy.PhoneWindowManager";
+	final static String CLASSNAME_NAVIGATIONBUTTONTRANSITIONS = "com.android.systemui.statusbar.phone.NavigationButtonTransitions";
 
 	final static String DEF_THEMEID = "Stock";
 	final static String DEF_THEMECOLOR = "White";
@@ -370,34 +371,54 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 					}
 				}
 			} else {
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, false)));
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_ime",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", true, false)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, false)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_back not found");
+				}
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_ime",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", true, false)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_back_ime not found");
+				}
 				try {
 					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_back_land",
 							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Back", false, true)));
 				} catch (Exception e) {
 					XposedBridge.log("Resource systemui:drawable/ic_sysbar_back_land not found");
 				}
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, false)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, false)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_home not found");
+				}
 				try {
 					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_home_land",
 							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Home", false, true)));
 				} catch (Exception e) {
 					XposedBridge.log("Resource systemui:drawable/ic_sysbar_home_land not found");
 				}
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, false)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, false)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_menu not found");
+				}
 				try {
 					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_menu_land",
 							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Menu", useAltMenu, true)));
 				} catch (Exception e) {
 					XposedBridge.log("Resource systemui:drawable/ic_sysbar_menu_land not found");
 				}
-				resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent",
-						modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
+				try {
+					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent",
+							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, false)));
+				} catch (Exception e) {
+					XposedBridge.log("Resource systemui:drawable/ic_sysbar_recent not found");
+				}
 				try {
 					resparam.res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", "ic_sysbar_recent_land",
 							modRes.fwd(mThemeIcons.getIconResId(themeId, themeColor, "Recent", false, true)));
@@ -1069,6 +1090,91 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 			} catch (NoSuchMethodError e2) {
 				XposedBridge.log("setMenuVisibility(boolean, boolean) not found");
 				return;
+			}
+
+			pref.reload();
+			boolean useTheme = pref.getBoolean("pref_usetheme", false);
+			if (useTheme) {
+				// disable Xperia button transition methods
+				try {
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateBackTransitions",
+							ImageView.class, boolean.class, boolean.class);
+
+					XposedBridge.log("Xperia updateBackTransitions(ImageView, boolean, boolean) found");
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateBackTransitions",
+							ImageView.class, boolean.class, boolean.class, new XC_MethodReplacement() {
+								@Override
+								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+									return null;
+								}
+							});
+				} catch (NoSuchMethodError e2) {
+					return;
+				}
+
+				try {
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateHomeTransitions",
+							ImageView.class, boolean.class);
+
+					XposedBridge.log("Xperia updateHomeTransitions(ImageView, boolean) found");
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateHomeTransitions",
+							ImageView.class, boolean.class, new XC_MethodReplacement() {
+								@Override
+								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+									return null;
+								}
+							});
+				} catch (NoSuchMethodError e2) {
+					return;
+				}
+
+				try {
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateImeSwitcherTransitions",
+							ImageView.class, boolean.class);
+
+					XposedBridge.log("Xperia updateImeSwitcherTransitions(ImageView, boolean) found");
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateImeSwitcherTransitions",
+							ImageView.class, boolean.class, new XC_MethodReplacement() {
+								@Override
+								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+									return null;
+								}
+							});
+				} catch (NoSuchMethodError e2) {
+					return;
+				}
+
+				try {
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateMenuTransitions",
+							ImageView.class, boolean.class);
+
+					XposedBridge.log("Xperia updateMenuTransitions(ImageView, boolean) found");
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateMenuTransitions",
+							ImageView.class, boolean.class, new XC_MethodReplacement() {
+								@Override
+								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+									return null;
+								}
+							});
+				} catch (NoSuchMethodError e2) {
+					return;
+				}
+
+				try {
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateRecentTransitions",
+							ImageView.class, boolean.class);
+
+					XposedBridge.log("Xperia updateRecentTransitions(ImageView, boolean) found");
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateRecentTransitions",
+							ImageView.class, boolean.class, new XC_MethodReplacement() {
+								@Override
+								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+									return null;
+								}
+							});
+				} catch (NoSuchMethodError e2) {
+					return;
+				}
 			}
 		} else if (lpparam.packageName.equals(PKGNAME_SYSTEM_SERVICE)) {
 			if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
