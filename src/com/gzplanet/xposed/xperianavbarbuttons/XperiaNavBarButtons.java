@@ -47,8 +47,7 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated.LayoutInflatedParam;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import de.robv.android.xposed.callbacks.XCallback;
 
-public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookInitPackageResources,
-		IXposedHookLoadPackage {
+public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookInitPackageResources, IXposedHookLoadPackage {
 	final static String PKGNAME_SYSTEM_SERVICE = "android";
 	final static String CLASSNAME_SYSTEMUI = "com.android.systemui";
 	final static String CLASSNAME_NAVIGATIONBARVIEW = "com.android.systemui.statusbar.phone.NavigationBarView";
@@ -105,8 +104,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		pref.makeWorldReadable();
 
 		pref.reload();
-		mKeyCodeLongPress = Integer.parseInt(pref.getString("pref_search_longpress_function",
-				String.valueOf(KEYCODE_NONE)));
+		mKeyCodeLongPress = Integer.parseInt(pref.getString("pref_search_longpress_function", String.valueOf(KEYCODE_NONE)));
 		mSearchFuncApp = pref.getString("pref_search_function_apps", null);
 		mSearchLongPressFuncApp = pref.getString("pref_search_longpress_function_apps", null);
 		mSearchFuncShortcut = pref.getString("pref_search_function_shortcut", null);
@@ -121,49 +119,39 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		try {
 			final Class<?> phoneWindowManager = XposedHelpers.findClass(classPhoneWindowManager, classLoader);
 
-			XposedHelpers.findMethodExact(phoneWindowManager, "setInitialDisplaySize", Display.class, int.class,
-					int.class, int.class);
-			XposedHelpers.findAndHookMethod(phoneWindowManager, "setInitialDisplaySize", Display.class, int.class,
-					int.class, int.class, new XC_MethodHook() {
-						protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-							pref.reload();
-							int navbarHeight = pref.getInt("pref_navbar_height", 100);
-							int navbarHeightLand = pref.getInt("pref_navbar_height_land", 100);
-							int navbarWidth = pref.getInt("pref_navbar_width", 100);
+			XposedHelpers.findMethodExact(phoneWindowManager, "setInitialDisplaySize", Display.class, int.class, int.class, int.class);
+			XposedHelpers.findAndHookMethod(phoneWindowManager, "setInitialDisplaySize", Display.class, int.class, int.class, int.class, new XC_MethodHook() {
+				protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+					pref.reload();
+					int navbarHeight = pref.getInt("pref_navbar_height", 100);
+					int navbarHeightLand = pref.getInt("pref_navbar_height_land", 100);
+					int navbarWidth = pref.getInt("pref_navbar_width", 100);
 
-							Display display = (Display) param.args[0];
-							Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
-							if (context == null || display.getDisplayId() != Display.DEFAULT_DISPLAY) {
-								return;
-							}
-							Resources res = context.getResources();
-							int[] navigationBarHeightForRotation = new int[4];
-							int[] navigationBarWidthForRotation = new int[4];
+					Display display = (Display) param.args[0];
+					Context context = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
+					if (context == null || display.getDisplayId() != Display.DEFAULT_DISPLAY) {
+						return;
+					}
+					Resources res = context.getResources();
+					int[] navigationBarHeightForRotation = new int[4];
+					int[] navigationBarWidthForRotation = new int[4];
 
-							int portraitRotation = XposedHelpers.getIntField(param.thisObject, "mPortraitRotation");
-							int upsideDownRotation = XposedHelpers.getIntField(param.thisObject, "mUpsideDownRotation");
-							int landscapeRotation = XposedHelpers.getIntField(param.thisObject, "mLandscapeRotation");
-							int seascapeRotation = XposedHelpers.getIntField(param.thisObject, "mSeascapeRotation");
+					int portraitRotation = XposedHelpers.getIntField(param.thisObject, "mPortraitRotation");
+					int upsideDownRotation = XposedHelpers.getIntField(param.thisObject, "mUpsideDownRotation");
+					int landscapeRotation = XposedHelpers.getIntField(param.thisObject, "mLandscapeRotation");
+					int seascapeRotation = XposedHelpers.getIntField(param.thisObject, "mSeascapeRotation");
 
-							navigationBarHeightForRotation[portraitRotation] = navigationBarHeightForRotation[upsideDownRotation] = (int) res
-									.getDimensionPixelSize(res.getIdentifier("navigation_bar_height", "dimen",
-											"android"))
-									* navbarHeight / 100;
-							navigationBarHeightForRotation[landscapeRotation] = navigationBarHeightForRotation[seascapeRotation] = (int) res
-									.getDimensionPixelSize(res.getIdentifier("navigation_bar_height_landscape",
-											"dimen", "android"))
-									* navbarHeightLand / 100;
-							navigationBarWidthForRotation[portraitRotation] = navigationBarWidthForRotation[upsideDownRotation] = navigationBarWidthForRotation[landscapeRotation] = navigationBarWidthForRotation[seascapeRotation] = (int) res
-									.getDimensionPixelSize(res
-											.getIdentifier("navigation_bar_width", "dimen", "android"))
-									* navbarWidth / 100;
+					navigationBarHeightForRotation[portraitRotation] = navigationBarHeightForRotation[upsideDownRotation] = (int) res.getDimensionPixelSize(res
+							.getIdentifier("navigation_bar_height", "dimen", "android")) * navbarHeight / 100;
+					navigationBarHeightForRotation[landscapeRotation] = navigationBarHeightForRotation[seascapeRotation] = (int) res.getDimensionPixelSize(res
+							.getIdentifier("navigation_bar_height_landscape", "dimen", "android")) * navbarHeightLand / 100;
+					navigationBarWidthForRotation[portraitRotation] = navigationBarWidthForRotation[upsideDownRotation] = navigationBarWidthForRotation[landscapeRotation] = navigationBarWidthForRotation[seascapeRotation] = (int) res
+							.getDimensionPixelSize(res.getIdentifier("navigation_bar_width", "dimen", "android")) * navbarWidth / 100;
 
-							XposedHelpers.setObjectField(param.thisObject, "mNavigationBarHeightForRotation",
-									navigationBarHeightForRotation);
-							XposedHelpers.setObjectField(param.thisObject, "mNavigationBarWidthForRotation",
-									navigationBarWidthForRotation);
-						};
-					});
+					XposedHelpers.setObjectField(param.thisObject, "mNavigationBarHeightForRotation", navigationBarHeightForRotation);
+					XposedHelpers.setObjectField(param.thisObject, "mNavigationBarWidthForRotation", navigationBarWidthForRotation);
+				};
+			});
 		} catch (ClassNotFoundError e) {
 			XposedBridge.log("Class PhoneWindowManager not found");
 		} catch (NoSuchMethodError e2) {
@@ -175,23 +163,21 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 			final Class<?> phoneWindowManager = XposedHelpers.findClass(classPhoneWindowManager, classLoader);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				XposedHelpers.findMethodExact(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class,
-						int.class);
-				XposedHelpers.findAndHookMethod(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class,
-						int.class, new XC_MethodHook(XCallback.PRIORITY_HIGHEST) {
-							protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-								interceptKeyBeforeQueueing(param);
-							};
-						});
+				XposedHelpers.findMethodExact(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class, int.class);
+				XposedHelpers.findAndHookMethod(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class, int.class, new XC_MethodHook(
+						XCallback.PRIORITY_HIGHEST) {
+					protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+						interceptKeyBeforeQueueing(param);
+					};
+				});
 			} else {
-				XposedHelpers.findMethodExact(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class,
-						int.class, boolean.class);
-				XposedHelpers.findAndHookMethod(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class,
-						int.class, boolean.class, new XC_MethodHook(XCallback.PRIORITY_HIGHEST) {
-							protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-								interceptKeyBeforeQueueing(param);
-							};
-						});
+				XposedHelpers.findMethodExact(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class, int.class, boolean.class);
+				XposedHelpers.findAndHookMethod(phoneWindowManager, "interceptKeyBeforeQueueing", KeyEvent.class, int.class, boolean.class, new XC_MethodHook(
+						XCallback.PRIORITY_HIGHEST) {
+					protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+						interceptKeyBeforeQueueing(param);
+					};
+				});
 			}
 		} catch (ClassNotFoundError e) {
 			XposedBridge.log("Class PhoneWindowManager not found");
@@ -226,16 +212,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						// handle long pressed
 						mSearchKeyLongPressed = true;
 						if (mKeyCodeLongPress != KEYCODE_NONE) {
-							performAction(context, handler, mKeyCodeLongPress, true, param.thisObject,
-									mSearchLongPressFuncApp, mSearchLongPressFuncShortcut);
+							performAction(context, handler, mKeyCodeLongPress, true, param.thisObject, mSearchLongPressFuncApp, mSearchLongPressFuncShortcut);
 							handled = true;
 						}
 					}
 				} else {
 					// handle single tap
 					if (!mSearchKeyLongPressed && keyCode < KEYCODE_NONE) {
-						performAction(context, handler, keyCode, false, param.thisObject, mSearchFuncApp,
-								mSearchFuncShortcut);
+						performAction(context, handler, keyCode, false, param.thisObject, mSearchFuncApp, mSearchFuncShortcut);
 						handled = true;
 					}
 					if (!mInjectedKeyCode)
@@ -249,8 +233,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		}
 	}
 
-	private void performAction(Context context, Handler handler, int keyCode, boolean longPressed, Object thisObject,
-			String app, String shortcut) {
+	private void performAction(Context context, Handler handler, int keyCode, boolean longPressed, Object thisObject, String app, String shortcut) {
 		if (longPressed && keyCode > 0) {
 			injectKey(context, handler, keyCode);
 		} else {
@@ -286,8 +269,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		}
 
 		if (longPressed && keyCode != KEYCODE_NONE)
-			XposedHelpers.callMethod(thisObject, "performHapticFeedbackLw", new Class<?>[] { WindowState.class,
-					int.class, boolean.class }, null, HapticFeedbackConstants.LONG_PRESS, false);
+			XposedHelpers.callMethod(thisObject, "performHapticFeedbackLw", new Class<?>[] { WindowState.class, int.class, boolean.class }, null,
+					HapticFeedbackConstants.LONG_PRESS, false);
 	}
 
 	/*
@@ -306,10 +289,9 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				try {
 					final long eventTime = SystemClock.uptimeMillis();
 					final InputManager inputManager = (InputManager) context.getSystemService(Context.INPUT_SERVICE);
-					XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50,
-							eventTime - 50, KeyEvent.ACTION_DOWN, keyCode, 0), 0);
-					XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50,
-							eventTime - 25, KeyEvent.ACTION_UP, keyCode, 0), 0);
+					XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 50, KeyEvent.ACTION_DOWN, keyCode, 0),
+							0);
+					XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 25, KeyEvent.ACTION_UP, keyCode, 0), 0);
 				} catch (Throwable t) {
 					XposedBridge.log(t);
 				}
@@ -461,8 +443,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				buttonsCount = orderList.length;
 				int leftMargin = pref.getInt("pref_left_margin", 0);
 				int rightMargin = pref.getInt("pref_right_margin", 0);
-				int searchKeycode = Integer.parseInt(pref.getString("pref_search_function",
-						String.valueOf(KeyEvent.KEYCODE_SEARCH)));
+				int searchKeycode = Integer.parseInt(pref.getString("pref_search_function", String.valueOf(KeyEvent.KEYCODE_SEARCH)));
 
 				mShowSearch = pref.getBoolean("pref_show_search", true);
 				mShowMenu = pref.getBoolean("pref_show_menu", true);
@@ -497,10 +478,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 					extraKeyWidth = mContext.getResources().getDimensionPixelSize(
 							liparam.res.getIdentifier("navigation_extra_key_width", "dimen", CLASSNAME_SYSTEMUI));
 
-				FrameLayout rot0 = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("rot0", "id",
-						CLASSNAME_SYSTEMUI));
-				FrameLayout rot90 = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("rot90", "id",
-						CLASSNAME_SYSTEMUI));
+				FrameLayout rot0 = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("rot0", "id", CLASSNAME_SYSTEMUI));
+				FrameLayout rot90 = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("rot90", "id", CLASSNAME_SYSTEMUI));
 				LinearLayout rot0NavButtons = null;
 				LinearLayout rot0LightsOut = null;
 				LinearLayout rot0LightsOutHigh = null;
@@ -509,21 +488,15 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				LinearLayout rot90LightsOutHigh = null;
 
 				if (rot0 != null) {
-					rot0NavButtons = (LinearLayout) rot0.findViewById(liparam.res.getIdentifier("nav_buttons", "id",
-							CLASSNAME_SYSTEMUI));
-					rot0LightsOut = (LinearLayout) rot0.findViewById(liparam.res.getIdentifier("lights_out", "id",
-							CLASSNAME_SYSTEMUI));
-					rot0LightsOutHigh = (LinearLayout) rot0.findViewById(liparam.res.getIdentifier("lights_out_high",
-							"id", CLASSNAME_SYSTEMUI));
+					rot0NavButtons = (LinearLayout) rot0.findViewById(liparam.res.getIdentifier("nav_buttons", "id", CLASSNAME_SYSTEMUI));
+					rot0LightsOut = (LinearLayout) rot0.findViewById(liparam.res.getIdentifier("lights_out", "id", CLASSNAME_SYSTEMUI));
+					rot0LightsOutHigh = (LinearLayout) rot0.findViewById(liparam.res.getIdentifier("lights_out_high", "id", CLASSNAME_SYSTEMUI));
 				}
 
 				if (rot90 != null) {
-					rot90NavButtons = (LinearLayout) rot90.findViewById(liparam.res.getIdentifier("nav_buttons", "id",
-							CLASSNAME_SYSTEMUI));
-					rot90LightsOut = (LinearLayout) rot90.findViewById(liparam.res.getIdentifier("lights_out", "id",
-							CLASSNAME_SYSTEMUI));
-					rot90LightsOutHigh = (LinearLayout) rot90.findViewById(liparam.res.getIdentifier("lights_out_high",
-							"id", CLASSNAME_SYSTEMUI));
+					rot90NavButtons = (LinearLayout) rot90.findViewById(liparam.res.getIdentifier("nav_buttons", "id", CLASSNAME_SYSTEMUI));
+					rot90LightsOut = (LinearLayout) rot90.findViewById(liparam.res.getIdentifier("lights_out", "id", CLASSNAME_SYSTEMUI));
+					rot90LightsOutHigh = (LinearLayout) rot90.findViewById(liparam.res.getIdentifier("lights_out_high", "id", CLASSNAME_SYSTEMUI));
 				}
 
 				// determine if a tablet is in use
@@ -539,18 +512,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				int actualButtonsCount = showSeparator ? buttonsCount - 1 : buttonsCount;
 
 				if (!mShowMenu && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					buttonWidth0 = Math
-							.round((float) (screenWidth - leftMargin - rightMargin - extraKeyWidth * 2 - separatorWidth0)
-									/ (float) actualButtonsCount);
-					buttonWidth90 = tabletMode ? Math.round((float) (screenWidthLand - leftMargin - rightMargin
-							- extraKeyWidth * 2 - separatorWidth90)
+					buttonWidth0 = Math.round((float) (screenWidth - leftMargin - rightMargin - extraKeyWidth * 2 - separatorWidth0)
+							/ (float) actualButtonsCount);
+					buttonWidth90 = tabletMode ? Math.round((float) (screenWidthLand - leftMargin - rightMargin - extraKeyWidth * 2 - separatorWidth90)
 							/ (float) actualButtonsCount) : buttonWidth0;
 				} else {
-					buttonWidth0 = Math.round((float) (screenWidth - leftMargin - rightMargin - separatorWidth0)
-							/ (float) actualButtonsCount);
-					buttonWidth90 = tabletMode ? Math
-							.round((float) (screenWidthLand - leftMargin - rightMargin - separatorWidth90)
-									/ (float) actualButtonsCount) : buttonWidth0;
+					buttonWidth0 = Math.round((float) (screenWidth - leftMargin - rightMargin - separatorWidth0) / (float) actualButtonsCount);
+					buttonWidth90 = tabletMode ? Math.round((float) (screenWidthLand - leftMargin - rightMargin - separatorWidth90)
+							/ (float) actualButtonsCount) : buttonWidth0;
 				}
 
 				// reset margin if value larger than screen width
@@ -561,12 +530,10 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				}
 				XposedBridge.log(String
 						.format("screenWidth:%d, screenWidthLand:%d, buttonWidth0:%d, buttonWidth90:%d, leftMargin:%d, rightMargin:%d, extraKeyWidth:%d, separatorWidthFactor:%d",
-								screenWidth, screenWidthLand, buttonWidth0, buttonWidth90, leftMargin, rightMargin,
-								extraKeyWidth, separatorWidthFactor));
+								screenWidth, screenWidthLand, buttonWidth0, buttonWidth90, leftMargin, rightMargin, extraKeyWidth, separatorWidthFactor));
 
 				// write stock button images to cache folder
-				XposedBridge.log(String.format("Stock button count:%d, ExternalCacheDir:%s", mStockButtons.size(),
-						mContext.getExternalCacheDir()));
+				XposedBridge.log(String.format("Stock button count:%d, ExternalCacheDir:%s", mStockButtons.size(), mContext.getExternalCacheDir()));
 				try {
 					if (mStockButtons.size() > 0) {
 						Iterator<Entry<String, Bitmap>> it = mStockButtons.entrySet().iterator();
@@ -597,15 +564,11 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						Map<String, ImageView> viewList = new HashMap<String, ImageView>();
 
 						// collection of existing button objects
-						viewList.put("Home", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("home",
-								"id", CLASSNAME_SYSTEMUI)));
-						viewList.put("Back", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("back",
-								"id", CLASSNAME_SYSTEMUI)));
-						viewList.put("Recent", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier(
-								"recent_apps", "id", CLASSNAME_SYSTEMUI)));
+						viewList.put("Home", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("home", "id", CLASSNAME_SYSTEMUI)));
+						viewList.put("Back", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("back", "id", CLASSNAME_SYSTEMUI)));
+						viewList.put("Recent", (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("recent_apps", "id", CLASSNAME_SYSTEMUI)));
 
-						ImageView menuView = (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("menu",
-								"id", CLASSNAME_SYSTEMUI));
+						ImageView menuView = (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("menu", "id", CLASSNAME_SYSTEMUI));
 						viewList.put("Menu", menuView);
 						// for Lollipop, container for menu and ime switcher
 						FrameLayout menuParent = null;
@@ -616,27 +579,25 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								fl.removeView(menuView);
 
 							menuParent = new FrameLayout(mContext);
-							menuParent.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth0
-									: extraKeyWidth, FrameLayout.LayoutParams.MATCH_PARENT));
+							menuParent.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth0 : extraKeyWidth,
+									FrameLayout.LayoutParams.MATCH_PARENT));
 
 							if (mShowMenu)
 								menuParent.addView(menuView);
 
 							// add IME switcher button as well
-							ImageView imeView = (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier(
-									"ime_switcher", "id", CLASSNAME_SYSTEMUI));
+							ImageView imeView = (ImageView) rot0NavButtons.findViewById(liparam.res.getIdentifier("ime_switcher", "id", CLASSNAME_SYSTEMUI));
 							// detach IME button from parent frame layout
 							fl = (FrameLayout) imeView.getParent();
 							if (fl != null)
 								fl.removeView(imeView);
 
 							imeView.setVisibility(View.INVISIBLE);
-							imeView.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth0
-									: extraKeyWidth, FrameLayout.LayoutParams.MATCH_PARENT));
+							imeView.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth0 : extraKeyWidth,
+									FrameLayout.LayoutParams.MATCH_PARENT));
 							imeView.setPadding(0, 0, 0, 0);
 							// imeView.setScaleType(ScaleType.FIT_CENTER);
-							imeView.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER
-									: ScaleType.CENTER);
+							imeView.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 							menuParent.addView(imeView);
 						}
 
@@ -644,8 +605,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							Drawable searchButtonDrawable = getSearchButton(useTheme, themeId, themeColor, false);
 							viewList.put(
 									"Search",
-									createButtonView(liparam, buttonWidth0, LinearLayout.LayoutParams.MATCH_PARENT,
-											"ic_sysbar_highlight", searchButtonDrawable, searchKeycode, "Search", true));
+									createButtonView(liparam, buttonWidth0, LinearLayout.LayoutParams.MATCH_PARENT, "ic_sysbar_highlight",
+											searchButtonDrawable, searchKeycode, "Search", true));
 						}
 
 						rot0NavButtons.removeAllViews();
@@ -656,32 +617,26 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						// for Lollipop, add extra padding if menu button is
 						// disabled
 						if (!mShowMenu && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-							addPlaceHolder(mContext, rot0NavButtons, extraKeyWidth,
-									LinearLayout.LayoutParams.MATCH_PARENT);
+							addPlaceHolder(mContext, rot0NavButtons, extraKeyWidth, LinearLayout.LayoutParams.MATCH_PARENT);
 
 						// add selected buttons
 						for (int i = 0; i < buttonsCount; i++) {
 
 							if (orderList[i].equals("Separator")) {
-								addPlaceHolder(mContext, rot0NavButtons, separatorWidth0,
-										LinearLayout.LayoutParams.MATCH_PARENT);
+								addPlaceHolder(mContext, rot0NavButtons, separatorWidth0, LinearLayout.LayoutParams.MATCH_PARENT);
 							} else {
 								ImageView view = viewList.remove(orderList[i]);
 								if (view != null) {
 									view.setVisibility(View.VISIBLE);
 									view.setPadding(0, 0, 0, 0);
 									// view.setScaleType(ScaleType.FIT_CENTER);
-									view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER
-											: ScaleType.CENTER);
+									view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 
-									if (orderList[i].equals("Menu")
-											&& Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-										view.setLayoutParams(new FrameLayout.LayoutParams(buttonWidth0,
-												FrameLayout.LayoutParams.MATCH_PARENT));
+									if (orderList[i].equals("Menu") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+										view.setLayoutParams(new FrameLayout.LayoutParams(buttonWidth0, FrameLayout.LayoutParams.MATCH_PARENT));
 										rot0NavButtons.addView(menuParent);
 									} else {
-										view.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth0,
-												LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+										view.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth0, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
 										rot0NavButtons.addView(view);
 									}
 								}
@@ -694,14 +649,12 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						// right margin
 						if (rightMargin > 0)
-							addPlaceHolder(mContext, rot0NavButtons, rightMargin,
-									LinearLayout.LayoutParams.MATCH_PARENT);
+							addPlaceHolder(mContext, rot0NavButtons, rightMargin, LinearLayout.LayoutParams.MATCH_PARENT);
 
 						// add unselected buttons and make them invisible
 						for (ImageView view : viewList.values()) {
 							view.setVisibility(View.INVISIBLE);
-							view.setLayoutParams(new LinearLayout.LayoutParams(0,
-									LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+							view.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
 							view.setPadding(0, 0, 0, 0);
 							view.setScaleType(ScaleType.CENTER);
 							rot0NavButtons.addView(view);
@@ -719,8 +672,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						int i = 0;
 						while (i < actualButtonsCount) {
-							rot0LightsOut.addView(createLightsOutView(liparam, buttonWidth0,
-									LinearLayout.LayoutParams.MATCH_PARENT, "ic_sysbar_lights_out_dot_small"));
+							rot0LightsOut.addView(createLightsOutView(liparam, buttonWidth0, LinearLayout.LayoutParams.MATCH_PARENT,
+									"ic_sysbar_lights_out_dot_small"));
 							i++;
 						}
 
@@ -736,20 +689,18 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						// left margin
 						if (leftMargin > 0)
-							addPlaceHolder(mContext, rot0LightsOutHigh, leftMargin,
-									LinearLayout.LayoutParams.MATCH_PARENT);
+							addPlaceHolder(mContext, rot0LightsOutHigh, leftMargin, LinearLayout.LayoutParams.MATCH_PARENT);
 
 						int i = 0;
 						while (i < actualButtonsCount) {
-							rot0LightsOutHigh.addView(createLightsOutView(liparam, buttonWidth0,
-									LinearLayout.LayoutParams.MATCH_PARENT, "ic_sysbar_lights_out_dot_small_high"));
+							rot0LightsOutHigh.addView(createLightsOutView(liparam, buttonWidth0, LinearLayout.LayoutParams.MATCH_PARENT,
+									"ic_sysbar_lights_out_dot_small_high"));
 							i++;
 						}
 
 						// right margin
 						if (rightMargin > 0)
-							addPlaceHolder(mContext, rot0LightsOutHigh, rightMargin,
-									LinearLayout.LayoutParams.MATCH_PARENT);
+							addPlaceHolder(mContext, rot0LightsOutHigh, rightMargin, LinearLayout.LayoutParams.MATCH_PARENT);
 					}
 				}
 
@@ -762,15 +713,11 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 						Map<String, ImageView> viewList = new HashMap<String, ImageView>();
 
 						// collection of existing button objects
-						viewList.put("Back", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("back",
-								"id", CLASSNAME_SYSTEMUI)));
-						viewList.put("Home", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("home",
-								"id", CLASSNAME_SYSTEMUI)));
-						viewList.put("Recent", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier(
-								"recent_apps", "id", CLASSNAME_SYSTEMUI)));
+						viewList.put("Back", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("back", "id", CLASSNAME_SYSTEMUI)));
+						viewList.put("Home", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("home", "id", CLASSNAME_SYSTEMUI)));
+						viewList.put("Recent", (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("recent_apps", "id", CLASSNAME_SYSTEMUI)));
 
-						ImageView menuView = (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("menu",
-								"id", CLASSNAME_SYSTEMUI));
+						ImageView menuView = (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("menu", "id", CLASSNAME_SYSTEMUI));
 						viewList.put("Menu", menuView);
 						// for Lollipop, container for menu and ime switcher
 						FrameLayout menuParent = null;
@@ -782,19 +729,17 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 							menuParent = new FrameLayout(mContext);
 							if (tabletMode)
-								menuParent.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth90
-										: extraKeyWidth, FrameLayout.LayoutParams.MATCH_PARENT));
+								menuParent.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth90 : extraKeyWidth,
+										FrameLayout.LayoutParams.MATCH_PARENT));
 							else
-								menuParent.setLayoutParams(new FrameLayout.LayoutParams(
-										FrameLayout.LayoutParams.MATCH_PARENT, mShowMenu ? buttonWidth90
-												: extraKeyWidth));
+								menuParent.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, mShowMenu ? buttonWidth90
+										: extraKeyWidth));
 
 							if (mShowMenu)
 								menuParent.addView(menuView);
 
 							// add IME switcher button as well
-							ImageView imeView = (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier(
-									"ime_switcher", "id", CLASSNAME_SYSTEMUI));
+							ImageView imeView = (ImageView) rot90NavButtons.findViewById(liparam.res.getIdentifier("ime_switcher", "id", CLASSNAME_SYSTEMUI));
 							// detach IME button from parent frame layout
 							fl = (FrameLayout) imeView.getParent();
 							if (fl != null)
@@ -802,16 +747,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 							imeView.setVisibility(View.INVISIBLE);
 							if (tabletMode)
-								imeView.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth90
-										: extraKeyWidth, FrameLayout.LayoutParams.MATCH_PARENT));
+								imeView.setLayoutParams(new FrameLayout.LayoutParams(mShowMenu ? buttonWidth90 : extraKeyWidth,
+										FrameLayout.LayoutParams.MATCH_PARENT));
 							else
-								imeView.setLayoutParams(new FrameLayout.LayoutParams(
-										FrameLayout.LayoutParams.MATCH_PARENT, mShowMenu ? buttonWidth90
-												: extraKeyWidth));
+								imeView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, mShowMenu ? buttonWidth90
+										: extraKeyWidth));
 							imeView.setPadding(0, 0, 0, 0);
 							// imeView.setScaleType(ScaleType.FIT_CENTER);
-							imeView.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER
-									: ScaleType.CENTER);
+							imeView.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 							menuParent.addView(imeView);
 						}
 
@@ -819,32 +762,27 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 							Drawable searchButtonDrawable = getSearchButton(useTheme, themeId, themeColor, !tabletMode);
 							viewList.put(
 									"Search",
-									createButtonView(liparam, buttonWidth90, LinearLayout.LayoutParams.MATCH_PARENT,
-											tabletMode ? "ic_sysbar_highlight" : "ic_sysbar_highlight_land",
-											searchButtonDrawable, searchKeycode, "Search", true));
+									createButtonView(liparam, buttonWidth90, LinearLayout.LayoutParams.MATCH_PARENT, tabletMode ? "ic_sysbar_highlight"
+											: "ic_sysbar_highlight_land", searchButtonDrawable, searchKeycode, "Search", true));
 						}
 
 						rot90NavButtons.removeAllViews();
 						// add selected buttons
 						if (tabletMode) { // navbar is positioned horizontally
-							final int extraPadding = Math
-									.round((float) (screenWidthLand - leftMargin - rightMargin - buttonWidth90
-											* actualButtonsCount - (mShowMenu ? 0 : extraKeyWidth * 2) - separatorWidth90) / 2f);
+							final int extraPadding = Math.round((float) (screenWidthLand - leftMargin - rightMargin - buttonWidth90 * actualButtonsCount
+									- (mShowMenu ? 0 : extraKeyWidth * 2) - separatorWidth90) / 2f);
 							// for Lollipop, add extra padding if menu button is
 							// disabled
 							if (!mShowMenu && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-								addPlaceHolder(mContext, rot90NavButtons, extraKeyWidth,
-										LinearLayout.LayoutParams.MATCH_PARENT);
+								addPlaceHolder(mContext, rot90NavButtons, extraKeyWidth, LinearLayout.LayoutParams.MATCH_PARENT);
 
 							// left margin + extra padding
 							if (leftMargin + extraPadding > 0)
-								addPlaceHolder(mContext, rot90NavButtons, leftMargin + extraPadding,
-										LinearLayout.LayoutParams.MATCH_PARENT);
+								addPlaceHolder(mContext, rot90NavButtons, leftMargin + extraPadding, LinearLayout.LayoutParams.MATCH_PARENT);
 
 							for (int i = 0; i < buttonsCount; i++) {
 								if (orderList[i].equals("Separator")) {
-									addPlaceHolder(mContext, rot90NavButtons, separatorWidth90,
-											LinearLayout.LayoutParams.MATCH_PARENT);
+									addPlaceHolder(mContext, rot90NavButtons, separatorWidth90, LinearLayout.LayoutParams.MATCH_PARENT);
 								} else {
 									ImageView view = viewList.remove(orderList[i]);
 
@@ -852,17 +790,13 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 										view.setVisibility(View.VISIBLE);
 										view.setPadding(0, 0, 0, 0);
 										// view.setScaleType(ScaleType.FIT_CENTER);
-										view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER
-												: ScaleType.CENTER);
+										view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 
-										if (orderList[i].equals("Menu")
-												&& Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-											view.setLayoutParams(new FrameLayout.LayoutParams(buttonWidth90,
-													FrameLayout.LayoutParams.MATCH_PARENT));
+										if (orderList[i].equals("Menu") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+											view.setLayoutParams(new FrameLayout.LayoutParams(buttonWidth90, FrameLayout.LayoutParams.MATCH_PARENT));
 											rot90NavButtons.addView(menuParent);
 										} else {
-											view.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth90,
-													LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+											view.setLayoutParams(new LinearLayout.LayoutParams(buttonWidth90, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
 											rot90NavButtons.addView(view);
 										}
 									}
@@ -871,8 +805,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 							// right margin + extra padding
 							if (rightMargin + extraPadding > 0)
-								addPlaceHolder(mContext, rot90NavButtons, rightMargin + extraPadding,
-										LinearLayout.LayoutParams.MATCH_PARENT);
+								addPlaceHolder(mContext, rot90NavButtons, rightMargin + extraPadding, LinearLayout.LayoutParams.MATCH_PARENT);
 
 							// for Lollipop, add IME switcher to original
 							// position if menu button is disabled
@@ -886,30 +819,24 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 							// top margin
 							if (leftMargin > 0)
-								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT,
-										leftMargin);
+								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT, leftMargin);
 
 							for (int i = buttonsCount - 1; i >= 0; i--) {
 								if (orderList[i].equals("Separator")) {
-									addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT,
-											separatorWidth0);
+									addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT, separatorWidth0);
 								} else {
 									ImageView view = viewList.remove(orderList[i]);
 									if (view != null) {
 										view.setVisibility(View.VISIBLE);
 										view.setPadding(0, 0, 0, 0);
 										// view.setScaleType(ScaleType.FIT_CENTER);
-										view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER
-												: ScaleType.CENTER);
+										view.setScaleType(Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ? ScaleType.FIT_CENTER : ScaleType.CENTER);
 
-										if (orderList[i].equals("Menu")
-												&& Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-											view.setLayoutParams(new FrameLayout.LayoutParams(
-													FrameLayout.LayoutParams.MATCH_PARENT, buttonWidth90));
+										if (orderList[i].equals("Menu") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+											view.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, buttonWidth90));
 											rot90NavButtons.addView(menuParent);
 										} else {
-											view.setLayoutParams(new LinearLayout.LayoutParams(
-													LinearLayout.LayoutParams.MATCH_PARENT, buttonWidth90, 0.0f));
+											view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, buttonWidth90, 0.0f));
 											rot90NavButtons.addView(view);
 										}
 									}
@@ -918,25 +845,21 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 							// bottom margin
 							if (rightMargin > 0)
-								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT,
-										rightMargin);
+								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT, rightMargin);
 
 							// for Lollipop, add extra padding if menu button is
 							// disabled
 							if (!mShowMenu && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT,
-										extraKeyWidth);
+								addPlaceHolder(mContext, rot90NavButtons, LinearLayout.LayoutParams.MATCH_PARENT, extraKeyWidth);
 						}
 
 						// add unselected buttons and make them invisible
 						for (ImageView view : viewList.values()) {
 							view.setVisibility(View.INVISIBLE);
 							if (tabletMode)
-								view.setLayoutParams(new LinearLayout.LayoutParams(0,
-										LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
+								view.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.0f));
 							else
-								view.setLayoutParams(new LinearLayout.LayoutParams(
-										LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
+								view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.0f));
 							view.setPadding(0, 0, 0, 0);
 							view.setScaleType(ScaleType.CENTER);
 							rot90NavButtons.addView(view);
@@ -954,15 +877,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						int i = 0;
 						while (i < actualButtonsCount) {
-							rot90LightsOut.addView(createLightsOutView(liparam, LinearLayout.LayoutParams.MATCH_PARENT,
-									buttonWidth90, "ic_sysbar_lights_out_dot_small"));
+							rot90LightsOut.addView(createLightsOutView(liparam, LinearLayout.LayoutParams.MATCH_PARENT, buttonWidth90,
+									"ic_sysbar_lights_out_dot_small"));
 							i++;
 						}
 
 						// right margin
 						if (rightMargin > 0)
-							addPlaceHolder(mContext, rot90LightsOut, LinearLayout.LayoutParams.MATCH_PARENT,
-									rightMargin);
+							addPlaceHolder(mContext, rot90LightsOut, LinearLayout.LayoutParams.MATCH_PARENT, rightMargin);
 					}
 
 					// handle lights out high
@@ -972,21 +894,18 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 						// left margin
 						if (leftMargin > 0)
-							addPlaceHolder(mContext, rot90LightsOutHigh, LinearLayout.LayoutParams.MATCH_PARENT,
-									leftMargin);
+							addPlaceHolder(mContext, rot90LightsOutHigh, LinearLayout.LayoutParams.MATCH_PARENT, leftMargin);
 
 						int i = 0;
 						while (i < actualButtonsCount) {
-							rot90LightsOutHigh.addView(createLightsOutView(liparam,
-									LinearLayout.LayoutParams.MATCH_PARENT, buttonWidth90,
+							rot90LightsOutHigh.addView(createLightsOutView(liparam, LinearLayout.LayoutParams.MATCH_PARENT, buttonWidth90,
 									"ic_sysbar_lights_out_dot_small_high"));
 							i++;
 						}
 
 						// right margin
 						if (rightMargin > 0)
-							addPlaceHolder(mContext, rot90LightsOutHigh, LinearLayout.LayoutParams.MATCH_PARENT,
-									rightMargin);
+							addPlaceHolder(mContext, rot90LightsOutHigh, LinearLayout.LayoutParams.MATCH_PARENT, rightMargin);
 					}
 				}
 
@@ -1009,11 +928,10 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		if (lpparam.packageName.equals(CLASSNAME_SYSTEMUI)) {
 			// hook setDisabledFlags method
 			try {
-				XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setDisabledFlags",
-						int.class, boolean.class);
+				XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setDisabledFlags", int.class, boolean.class);
 
-				XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setDisabledFlags",
-						int.class, boolean.class, new XC_MethodHook() {
+				XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setDisabledFlags", int.class, boolean.class,
+						new XC_MethodHook() {
 							@Override
 							protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 								// keep original value for afterHookedMethod
@@ -1025,11 +943,10 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								final int disabledFlags = (Integer) param.args[0];
 								final boolean force = (Boolean) param.args[1];
 
-								final View mCurrentView = (View) XposedHelpers.getObjectField(param.thisObject,
-										"mCurrentView");
+								final View mCurrentView = (View) XposedHelpers.getObjectField(param.thisObject, "mCurrentView");
 
-								final View recentButton = mCurrentView.findViewById(mCurrentView.getResources()
-										.getIdentifier("recent_apps", "id", CLASSNAME_SYSTEMUI));
+								final View recentButton = mCurrentView.findViewById(mCurrentView.getResources().getIdentifier("recent_apps", "id",
+										CLASSNAME_SYSTEMUI));
 								final View searchButton = mCurrentView.findViewWithTag("Search");
 
 								if (!force && mDisabledFlags == disabledFlags)
@@ -1041,18 +958,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 								final boolean disableHome = (disabledFlags & View.STATUS_BAR_DISABLE_HOME) != 0;
 
 								if (searchButton != null)
-									searchButton.setVisibility(mShowSearch ? (disableHome ? View.INVISIBLE
-											: View.VISIBLE) : View.GONE);
+									searchButton.setVisibility(mShowSearch ? (disableHome ? View.INVISIBLE : View.VISIBLE) : View.GONE);
 								if (recentButton != null)
-									recentButton.setVisibility(mShowRecent ? (disableRecent ? View.INVISIBLE
-											: View.VISIBLE) : View.INVISIBLE);
+									recentButton.setVisibility(mShowRecent ? (disableRecent ? View.INVISIBLE : View.VISIBLE) : View.INVISIBLE);
 
 								if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-									final View menuButton = (View) XposedHelpers.callMethod(param.thisObject,
-											"getMenuButton");
+									final View menuButton = (View) XposedHelpers.callMethod(param.thisObject, "getMenuButton");
 									if (menuButton != null)
-										menuButton.setVisibility(mShowMenu ? (disableHome ? View.INVISIBLE
-												: View.VISIBLE) : View.GONE);
+										menuButton.setVisibility(mShowMenu ? (disableHome ? View.INVISIBLE : View.VISIBLE) : View.GONE);
 								}
 							}
 						});
@@ -1063,11 +976,10 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 			// replace setMenuVisibility(boolean, boolean) method
 			try {
-				XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setMenuVisibility",
-						boolean.class, boolean.class);
+				XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setMenuVisibility", boolean.class, boolean.class);
 
-				XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setMenuVisibility",
-						boolean.class, boolean.class, new XC_MethodReplacement() {
+				XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARVIEW, lpparam.classLoader, "setMenuVisibility", boolean.class, boolean.class,
+						new XC_MethodReplacement() {
 							@Override
 							protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1075,11 +987,9 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 									View menuView = (View) XposedHelpers.callMethod(param.thisObject, "getMenuButton");
 									if (menuView != null) {
-										final int mNavigationIconHints = (Integer) XposedHelpers.getIntField(
-												param.thisObject, "mNavigationIconHints");
+										final int mNavigationIconHints = (Integer) XposedHelpers.getIntField(param.thisObject, "mNavigationIconHints");
 
-										shouldShow = mShowMenu
-												&& ((mNavigationIconHints & NAVIGATION_HINT_IME_SHOWN) == 0);
+										shouldShow = mShowMenu && ((mNavigationIconHints & NAVIGATION_HINT_IME_SHOWN) == 0);
 										menuView.setVisibility(shouldShow ? View.VISIBLE : View.INVISIBLE);
 									}
 									XposedHelpers.setBooleanField(param.thisObject, "mShowMenu", mShowMenu);
@@ -1097,40 +1007,32 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 			if (useTheme) {
 				// disable Xperia button transition methods
 				try {
-					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateBackTransitions",
-							ImageView.class, boolean.class, boolean.class);
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateBackTransitions", ImageView.class,
+							boolean.class, boolean.class);
 
 					XposedBridge.log("Xperia updateBackTransitions(ImageView, boolean, boolean) found");
-					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateBackTransitions",
-							ImageView.class, boolean.class, boolean.class, new XC_MethodReplacement() {
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateBackTransitions", ImageView.class,
+							boolean.class, boolean.class, new XC_MethodReplacement() {
 								@Override
 								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
 									return null;
 								}
 							});
-				} catch (NoSuchMethodError e2) {
-					return;
-				}
 
-				try {
-					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateHomeTransitions",
-							ImageView.class, boolean.class);
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateHomeTransitions", ImageView.class,
+							boolean.class);
 
 					XposedBridge.log("Xperia updateHomeTransitions(ImageView, boolean) found");
-					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateHomeTransitions",
-							ImageView.class, boolean.class, new XC_MethodReplacement() {
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateHomeTransitions", ImageView.class,
+							boolean.class, new XC_MethodReplacement() {
 								@Override
 								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
 									return null;
 								}
 							});
-				} catch (NoSuchMethodError e2) {
-					return;
-				}
 
-				try {
-					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateImeSwitcherTransitions",
-							ImageView.class, boolean.class);
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateImeSwitcherTransitions", ImageView.class,
+							boolean.class);
 
 					XposedBridge.log("Xperia updateImeSwitcherTransitions(ImageView, boolean) found");
 					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateImeSwitcherTransitions",
@@ -1140,40 +1042,32 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 									return null;
 								}
 							});
-				} catch (NoSuchMethodError e2) {
-					return;
-				}
 
-				try {
-					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateMenuTransitions",
-							ImageView.class, boolean.class);
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateMenuTransitions", ImageView.class,
+							boolean.class);
 
 					XposedBridge.log("Xperia updateMenuTransitions(ImageView, boolean) found");
-					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateMenuTransitions",
-							ImageView.class, boolean.class, new XC_MethodReplacement() {
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateMenuTransitions", ImageView.class,
+							boolean.class, new XC_MethodReplacement() {
 								@Override
 								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
 									return null;
 								}
 							});
-				} catch (NoSuchMethodError e2) {
-					return;
-				}
 
-				try {
-					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateRecentTransitions",
-							ImageView.class, boolean.class);
+					XposedHelpers.findMethodExact(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateRecentTransitions", ImageView.class,
+							boolean.class);
 
 					XposedBridge.log("Xperia updateRecentTransitions(ImageView, boolean) found");
-					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateRecentTransitions",
-							ImageView.class, boolean.class, new XC_MethodReplacement() {
+					XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBUTTONTRANSITIONS, lpparam.classLoader, "updateRecentTransitions", ImageView.class,
+							boolean.class, new XC_MethodReplacement() {
 								@Override
 								protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
 									return null;
 								}
 							});
+				} catch (ClassNotFoundError e1) {
 				} catch (NoSuchMethodError e2) {
-					return;
 				}
 			}
 		} else if (lpparam.packageName.equals(PKGNAME_SYSTEM_SERVICE)) {
@@ -1188,24 +1082,23 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height, 0.0f);
 		iv.setLayoutParams(lp);
-		iv.setImageDrawable(liparam.res.getDrawable(liparam.res.getIdentifier(imgResName, "drawable",
-				CLASSNAME_SYSTEMUI)));
+		iv.setImageDrawable(liparam.res.getDrawable(liparam.res.getIdentifier(imgResName, "drawable", CLASSNAME_SYSTEMUI)));
 		iv.setScaleType(ScaleType.CENTER);
 
 		return iv;
 	}
 
-	ImageView createButtonView(LayoutInflatedParam liparam, int width, int height, String glowBgResName, Drawable img,
-			int code, String tag, boolean supportLongpress) {
+	ImageView createButtonView(LayoutInflatedParam liparam, int width, int height, String glowBgResName, Drawable img, int code, String tag,
+			boolean supportLongpress) {
 		final ImageView view;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
 			view = new KeyButtonViewL(mContext, code, supportLongpress);
 		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-			view = new KeyButtonView(mContext, code, supportLongpress, liparam.res.getDrawable(liparam.res
-					.getIdentifier(glowBgResName, "drawable", CLASSNAME_SYSTEMUI)));
+			view = new KeyButtonView(mContext, code, supportLongpress, liparam.res.getDrawable(liparam.res.getIdentifier(glowBgResName, "drawable",
+					CLASSNAME_SYSTEMUI)));
 		else
-			view = new KeyButtonViewICS(mContext, code, supportLongpress, liparam.res.getDrawable(liparam.res
-					.getIdentifier(glowBgResName, "drawable", CLASSNAME_SYSTEMUI)));
+			view = new KeyButtonViewICS(mContext, code, supportLongpress, liparam.res.getDrawable(liparam.res.getIdentifier(glowBgResName, "drawable",
+					CLASSNAME_SYSTEMUI)));
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height, 0.0f);
 		view.setLayoutParams(lp);
 		view.setImageDrawable(img);
@@ -1215,15 +1108,19 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 	}
 
 	void replaceCustomButton(XResources res, String resName, String type, boolean isAlt, boolean landscape) {
-		Bitmap bitmap = mCustomButtons.getBitmap(type, isAlt, landscape);
-		if (bitmap != null) {
-			final Drawable drawable = new BitmapDrawable(res, bitmap);
-			res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", resName, new XResources.DrawableLoader() {
-				@Override
-				public Drawable newDrawable(XResources res, int id) throws Throwable {
-					return drawable;
-				}
-			});
+		try {
+			Bitmap bitmap = mCustomButtons.getBitmap(type, isAlt, landscape);
+			if (bitmap != null) {
+				final Drawable drawable = new BitmapDrawable(res, bitmap);
+				res.setReplacement(CLASSNAME_SYSTEMUI, "drawable", resName, new XResources.DrawableLoader() {
+					@Override
+					public Drawable newDrawable(XResources res, int id) throws Throwable {
+						return drawable;
+					}
+				});
+			}
+		} catch (Exception e) {
+			XposedBridge.log("Resource systemui:drawable/" + resName + " not found");
 		}
 	}
 
@@ -1239,8 +1136,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 				}
 			}
 			if (drawable == null)
-				drawable = modRes
-						.getDrawable(mThemeIcons.getIconResId(themeId, themeColor, "Search", false, landscape));
+				drawable = modRes.getDrawable(mThemeIcons.getIconResId(themeId, themeColor, "Search", false, landscape));
 		} else {
 			drawable = modRes.getDrawable(landscape ? R.drawable.ic_sysbar_search_land : R.drawable.ic_sysbar_search);
 		}
