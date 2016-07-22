@@ -112,6 +112,14 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 		mSearchFuncShortcut = pref.getString("pref_search_function_shortcut", null);
 		mSearchLongPressFuncShortcut = pref.getString("pref_search_longpress_function_shortcut", null);
 
+		// force navbar on Samsung devices
+		try {
+			XResources.setSystemWideReplacement("android", "bool", "config_showNavigationBar", true);
+			XposedBridge.log("Set config_showNavigationBar");
+		} catch (Throwable t) {
+			XposedBridge.log("Resource config_showNavigationBar not found");
+		}
+
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1)
 			handlePhoneWindowManager(null, CLASSNAME_PHONEWINDOWMANAGER);
 	}
