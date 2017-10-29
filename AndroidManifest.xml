@@ -1,7 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gzplanet.xposed.xperianavbarbuttons"
+<<<<<<< HEAD
     android:versionCode="60"
     android:versionName="6.0 (build 10291526)" >
+=======
+    android:versionCode="53"
+    android:versionName="5.3 (build 12121415)" >
+>>>>>>> origin/master
 
     <uses-sdk
         android:minSdkVersion="14"
