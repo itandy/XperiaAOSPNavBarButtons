@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android 導航欄自定義</string>
+    <string name="navbar_preview">導航欄效果預覽</string>
+    <string name="available_themes">可用風格</string>
+    <string name="selected_theme">選中導航欄風格</string>
+    <string name="available_colors">可用顏色</string>
+    <string name="confirm">確認</string>
+    <string name="import_button_iamges">導入按鍵圖標圖片</string>
+    <string name="changelog_full_title">升級日誌</string>
+    <string name="changelog_title">"更新了什麼"</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">更多</string>
+
+    <string name="title_show_recent">顯示後台切換鍵</string>
+    <string name="summ_show_recent">顯示後台切換鍵</string>
+
+    <string name="title_show_menu">顯示菜單鍵</string>
+    <string name="summ_show_menu">顯示菜單鍵</string>
+
+    <string name="title_show_search">顯示搜索鍵</string>
+    <string name="summ_show_search">顯示搜索鍵</string>
+
+    <string name="title_reorder">排序按鍵</string>
+    <string name="summ_reorder">重新排序按鍵</string>
+
+    <string name="title_theme">選擇風格</string>
+    <string name="summ_theme">選擇導航欄風格</string>
+
+    <string name="title_use_alt_menu">使用備用菜單鍵按鈕</string>
+    <string name="summ_use_alt_menu">僅選擇了風格後才有效</string>
+
+    <string name="title_restart_systemui">立即激活</string>
+    <string name="summ_restart_systemui">導航欄高度及寬度需重啟</string>
+
+    <string name="title_hints">提示</string>
+    <string name="summ_hints">如何自定義按鍵圖標</string>
+    
+    <string name="title_left_margin">左或上邊距寬度</string>
+    <string name="summ_left_margin">左或上邊距寬度 (像素)</string>
+    
+    <string name="title_right_margin">右或下邊距寬度</string>
+    <string name="summ_right_margin">右或下邊距寬度 (像素)</string>
+    
+    <string name="title_navbar_height">導航欄高度 (設定後需重啟)</string>
+    <string name="summ_navbar_height">導航欄高度比 (50%-150%)</string>
+    
+    <string name="title_navbar_height_land">導航欄高度 (設定後需重啟)</string>
+    <string name="summ_navbar_height_land">導航欄高度比 (50%-150%) (平版)</string>
+    
+    <string name="title_navbar_width">導航欄寬度 (設定後需重啟)</string>
+    <string name="summ_navbar_width">導航欄寬度比 (50%-150%) (橫向)</string>
+    
+    <string name="title_search_function">搜尋鍵功能</string>
+    <string name="summ_search_function">己設定搜尋鍵功能: %s</string>
+    <string name="summ_search_function2" formatted="false">己設定搜尋鍵功能: %s (%s)</string>
+    <string name="summ_search_function3" formatted="false">己設定搜尋鍵功能: %s (%s:%s)</string>
+    
+    <string name="title_search_longpress_function">搜尋鍵長按功能</string>
+    
+    <string name="cat_buttons">按鍵</string>
+    <string name="cat_layout">導航欄格局</string>
+    <string name="cat_others">其他</string>
+
+    <string name="custom_button_images_found">找到%d個圖像文件</string>
+
+	<string name="text_none">沒有功能</string>
+    <string name="text_calculator">計算機</string>
+    <string name="text_calendar">日曆</string>
+    <string name="text_call">電話</string>
+    <string name="text_camera">相機</string>
+    <string name="text_contacts">人物</string>
+    <string name="text_search">搜尋</string>
+    <string name="text_switch_lastapp">切換至上一個應用程式</string>
+    <string name="text_screenshot">螢幕截圖</string>
+    <string name="text_screen_off">關閉螢幕</string>
+    <string name="text_power_menu">電源選單</string>
+    <string name="text_notification_panel">展開通知面板</string>
+    <string name="text_quick_settings_panel">展開快速設定面板</string>
+    <string name="text_launch_app">啟動應用程式</string>
+    <string name="text_kill_app">結束當前應用程式</string>
+    <string name="text_launch_shortcut">啟動應用程式捷徑</string>
+    <string name="text_unknown">不明</string>
+    
+    <string name="msg_unknown_app">啟動應用程式出錯</string>
+    <string name="msg_unknown_shortcut">不明啟動應用程式捷徑</string>
+
+    <string name="title_show_separator">顯示分隔</string>
+    <string name="summ_show_separator">顯示分隔 (透明顯示)</string>
+    <string name="title_separator_width">分隔寬度</string>
+    <string name="summ_separator_width">分隔寬度比 (0%-90%)</string>
+
+</resources>

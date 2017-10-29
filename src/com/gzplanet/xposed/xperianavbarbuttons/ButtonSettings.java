@@ -16,6 +16,9 @@ import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 
 public class ButtonSettings {
+	final static String KEY_MENU_N = "menu_ime";
+	final static String GRAVITY_SEPARATOR = ";";
+
 	private boolean mShowMenu = false;
 	private boolean mShowSearch = false;
 	private boolean mShowRecent = false;

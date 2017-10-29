@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_restart_systemui">Применить сейчас</string>
+    <string name="summ_restart_systemui">Для изменения высоты и ширины навигационной панели требуется перезагрузка.</string>
+    <string name="title_search_function">Нажатие кнопки поиска</string>
+    <string name="title_search_longpress_function">Удержание кнопки поиска</string>
+
+</resources>

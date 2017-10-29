@@ -24,6 +24,8 @@ import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
+
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -80,8 +82,14 @@ public class KeyButtonViewL extends ImageView {
 		mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 		mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-		Class<?> classKeyButtonRipple = XposedHelpers.findClass(CLASSNAME_KEYBUTTONRIPPLE, context.getClassLoader());
-		setBackground((Drawable) XposedHelpers.newInstance(classKeyButtonRipple, context, this));
+		try {
+			Class<?> classKeyButtonRipple = XposedHelpers.findClass(CLASSNAME_KEYBUTTONRIPPLE, context.getClassLoader());
+			setBackground((Drawable) XposedHelpers.newInstance(classKeyButtonRipple, context, this));
+		} catch (XposedHelpers.ClassNotFoundError e) {
+			XposedBridge.log("Class KeyButtonRipple not found");
+		} catch (NoSuchMethodError e2) {
+			XposedBridge.log("Method setBackground not found");
+		}
 	}
 
 	public KeyButtonViewL(Context context, final int code, final boolean supportsLongpress) {
@@ -97,8 +105,14 @@ public class KeyButtonViewL extends ImageView {
 		mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 		mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-		Class<?> classKeyButtonRipple = XposedHelpers.findClass(CLASSNAME_KEYBUTTONRIPPLE, context.getClassLoader());
-		setBackground((Drawable) XposedHelpers.newInstance(classKeyButtonRipple, context, this));
+		try {
+			Class<?> classKeyButtonRipple = XposedHelpers.findClass(CLASSNAME_KEYBUTTONRIPPLE, context.getClassLoader());
+			setBackground((Drawable) XposedHelpers.newInstance(classKeyButtonRipple, context, this));
+		} catch (XposedHelpers.ClassNotFoundError e) {
+			XposedBridge.log("Class KeyButtonRipple not found");
+		} catch (NoSuchMethodError e2) {
+			XposedBridge.log("Method setBackground not found");
+		}
 	}
 
 	@Override

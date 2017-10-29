@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="title_restart_systemui">立即激活</string>
+    <string name="summ_restart_systemui">导航栏高度及宽度需重启</string>
+
+    <string name="title_search_function">搜寻键功能</string>
+    <string name="title_search_longpress_function">搜寻键长按功能</string>
+
+</resources>

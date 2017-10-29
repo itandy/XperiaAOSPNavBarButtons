@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="title_restart_systemui">Apply Now</string>
+    <string name="summ_restart_systemui">Changing navigation bar height and width requires a reboot.</string>
+
+    <string name="title_search_function">Search button action</string>
+    <string name="title_search_longpress_function">Search button long press action</string>
+
+</resources>
