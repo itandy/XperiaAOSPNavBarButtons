@@ -54,7 +54,7 @@ public class Utils {
     private final static String SYSTEM_DIALOG_REASON_GLOBAL_ACTIONS = "globalactions";
     private final static String CLASS_WINDOW_STATE = "android.view.WindowManagerPolicy$WindowState";
 
-    protected final static String PREF_AUTHORITY = "com.gzplanet.app.preferences";
+    protected final static String PREF_AUTHORITY = "com.gzplanet.app.xperianavbarbuttons_preferences";
     protected final static String PREF_NAME = "com.gzplanet.xposed.xperianavbarbuttons_preferences";
 
     private static Context mContext;

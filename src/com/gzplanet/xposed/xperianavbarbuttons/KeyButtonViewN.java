@@ -32,6 +32,9 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK
 
 @TargetApi(Build.VERSION_CODES.N)
 public class KeyButtonViewN extends ImageView {
+    final long[] PATTERN_KEYPRESS = new long[]{0, 70, 0, 0};
+    final long[] PATTERN_LONGPRESS = new long[]{0, 50, 0, 0};
+
     private int mContentDescriptionRes;
     private long mDownTime;
     private int mCode;
@@ -274,8 +277,9 @@ public class KeyButtonViewN extends ImageView {
         if (action == KeyEvent.ACTION_DOWN) {
             if (repeatCount > 0) {
                 performAction(mCodeLongPress, mFuncAppLongPress, mFuncShortcutLongPress);
-                vibrateLongPress();
-            }
+                vibrate(true);
+            } else
+                vibrate(false);
         } else {
             if (!mLongClicked)
                 performAction(mCode, mFuncApp, mFuncShortcut);
@@ -307,10 +311,10 @@ public class KeyButtonViewN extends ImageView {
         }
     }
 
-    private void vibrateLongPress() {
+    private void vibrate(boolean longPress) {
+
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-        long[] longPressVibePattern = getLongIntArray(mContext.getResources(), R.array.config_longPressVibePattern);
-        vibrator.vibrate(longPressVibePattern, -1);
+        vibrator.vibrate(longPress ? PATTERN_LONGPRESS : PATTERN_KEYPRESS, -1);
 
     }
 

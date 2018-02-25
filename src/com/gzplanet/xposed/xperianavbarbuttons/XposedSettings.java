@@ -478,6 +478,7 @@ public class XposedSettings extends PreferenceActivity {
                         intent.setAction(XperiaNavBarButtons.ACTION_NAVBAR_CHANGED);
                         intent.putExtra("order_list", mSettings.getOrderListString());
                         intent.putExtra("show_menu", mShowMenu);
+                        intent.putExtra("show_toast", true);
                         sendBroadcast(intent);
                     } else {
                         Toast.makeText(XposedSettings.this, "Restarting SystemUI...", Toast.LENGTH_SHORT).show();

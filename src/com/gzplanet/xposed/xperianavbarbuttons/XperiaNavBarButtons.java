@@ -147,6 +147,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                 if (intent.hasExtra("show_menu") && intent.hasExtra("show_menu") && mNavigationBarView != null) {
                     String orderList = intent.getStringExtra("order_list");
                     boolean showMenu = intent.getBooleanExtra("show_menu", true);
+                    boolean showToast = intent.getBooleanExtra("show_toast", false);
 
                     Configuration mConfiguration = (Configuration) XposedHelpers.getObjectField(mNavigationBarView, "mConfiguration");
                     XposedHelpers.callMethod(mNavigationBarView, "updateIcons", context, Configuration.EMPTY, mConfiguration);
@@ -154,7 +155,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                     if (mNavigationBarInflaterView != null) {
                         XposedHelpers.callMethod(mNavigationBarInflaterView, "clearViews");
                         XposedHelpers.callMethod(mNavigationBarInflaterView, "inflateLayout", getOrderListForN(orderList, showMenu));
-                        Toast.makeText(context, "Changes applied", Toast.LENGTH_SHORT).show();
+                        if (showToast)
+                            Toast.makeText(context, "Changes applied", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(context, "mNavigationBarInflaterView is NULL", Toast.LENGTH_SHORT).show();
                     }
@@ -1208,8 +1210,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
                             String[] sets = newLayout.split(GRAVITY_SEPARATOR);
 //                            XposedBridge.log("newLayout: " + newLayout);
-//                            XposedBridge.log(String.format("endsGroup0.getChildCount: %d endsGroup90.getChildCount:%d",
-//                                    endsGroup0.getChildCount(), endsGroup90.getChildCount()));
+//                            XposedBridge.log(String.format("endsGroup0.getChildCount: %d endsGroup90.getChildCount:%d", endsGroup0.getChildCount(), endsGroup90.getChildCount()));
                             for (int i = 0; i < sets.length; i++) {
                                 String[] section = sets[i].split(BUTTON_SEPARATOR);
 
@@ -1309,85 +1310,22 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                             String.class, ViewGroup.class, boolean.class, int.class, new XC_MethodHook() {
                                 @Override
                                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                                    if (mContext == null)
-                                        mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
-                                    SharedPreferences remotePref = new RemotePreferences(mContext, Utils.PREF_AUTHORITY, Utils.PREF_NAME);
-
-                                    String buttonSpec = (String) param.args[0];
-                                    ViewGroup parent = (ViewGroup) param.args[1];
-                                    boolean landscape = (boolean) param.args[2];
-                                    int indexInParent = (int) param.args[3];
-
-                                    // theme settings
-                                    prepareForTheme(remotePref);
-
-                                    if (param.getResult() == null) {
-//                                        XposedBridge.log(String.format("buttonSpec:%s landscape:%b", buttonSpec, landscape));
-
-                                        Drawable drawable;
-                                        ImageView view;
-
-                                        if (KEY_SEARCH_N.equals(buttonSpec)) {
-                                            int keyCode = Integer.parseInt(remotePref.getString("pref_search_function", String.valueOf(KeyEvent.KEYCODE_SEARCH)));
-                                            int keyCodeLongPress = Integer.parseInt(remotePref.getString("pref_search_longpress_function", String.valueOf(KEYCODE_NONE)));
-                                            String funcApp = remotePref.getString("pref_search_function_apps", null);
-                                            String funcAppLongPress = remotePref.getString("pref_search_longpress_function_apps", null);
-                                            String funcShortcut = remotePref.getString("pref_search_function_shortcut", null);
-                                            String funcShortcutLongPress = remotePref.getString("pref_search_longpress_function_shortcut", null);
-
-                                            int layoutWidth = landscape ? LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT;
-                                            int layoutHeight = landscape ? LinearLayout.LayoutParams.WRAP_CONTENT : LinearLayout.LayoutParams.MATCH_PARENT;
-                                            drawable = getButtonDrawable(mThemeIcons, mCustomButtons, mUseTheme, mThemeId, mThemeColor, landscape, false, "Search");
-                                            view = createButtonView(mContext, null, layoutWidth, layoutHeight, null,
-                                                    drawable, keyCode, "search", RES_ID_SEARCH, true);
-
-                                            ((KeyButtonViewN) view).setCodeLongPress(keyCodeLongPress);
-                                            ((KeyButtonViewN) view).setFuncApp(funcApp);
-                                            ((KeyButtonViewN) view).setFuncAppLongPress(funcAppLongPress);
-                                            ((KeyButtonViewN) view).setFuncShortcut(funcShortcut);
-                                            ((KeyButtonViewN) view).setFuncShortcutLongPress(funcShortcutLongPress);
-
-//                                            XposedBridge.log(String.format("keyCode:%d, keyCodeLongPress:%d", keyCode, keyCodeLongPress));
-
-                                        } else if (KEY_SEPARATOR_N.equals(buttonSpec) || KEY_LEFT_MARGIN_N.equals(buttonSpec)
-                                                || KEY_RIGHT_MARGIN_N.equals(buttonSpec) || KEY_LEFT_IME_PADDING_N.equals(buttonSpec)) {
-                                            int layoutWidth = landscape ? LinearLayout.LayoutParams.MATCH_PARENT : 1;
-                                            int layoutHeight = landscape ? 1 : LinearLayout.LayoutParams.MATCH_PARENT;
-                                            view = new ImageView(mContext);
-                                            view.setLayoutParams(new LinearLayout.LayoutParams(layoutWidth, layoutHeight, 0.0f));
-                                            view.setTag(buttonSpec);
-                                        } else {
-                                            param.setResult(null);
-                                            return;
-                                        }
-                                        parent.addView(view);
-
-                                        if (landscape)
-                                            XposedHelpers.setObjectField(param.thisObject, "mLastRot90", view);
-                                        else
-                                            XposedHelpers.setObjectField(param.thisObject, "mLastRot0", view);
-                                    } else if (KEY_HOME_N.equals(buttonSpec) || KEY_MENU_N.equals(buttonSpec)
-                                            || KEY_BACK_N.equals(buttonSpec) || KEY_RECENT_N.equals(buttonSpec)) {
-                                        View view = (View) param.getResult();
-                                        if (mUseTheme) {
-                                            String key = nKey2OldKey(buttonSpec);
-                                            Drawable drawable = getButtonDrawable(mThemeIcons, mCustomButtons, mUseTheme, mThemeId, mThemeColor,
-                                                    landscape, KEY_MENU_N.equals(buttonSpec) && mUseAltMenu, key);
-                                            if (KEY_MENU_N.equals(buttonSpec)) {
-                                                int menuId = mContext.getResources().getIdentifier("menu", "id", CLASSNAME_SYSTEMUI);
-                                                for (int i = 0; i < ((FrameLayout) view).getChildCount(); i++)
-                                                    if (((FrameLayout) view).getChildAt(i).getId() == menuId)
-                                                        ((ImageView) ((FrameLayout) view).getChildAt(i)).setImageDrawable(drawable);
-                                            } else
-                                                ((ImageView) view).setImageDrawable(drawable);
-                                        }
-                                        view.setTag(buttonSpec);
-                                    }
+                                    inflateButtonN(param);
                                 }
                             });
                 } catch (NoSuchMethodError e) {
-                    XposedBridge.log("inflateButton not found");
-                    return;
+                    try {
+                        XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARINFLATERVIEW, lpparam.classLoader, "inflateButton",
+                                String.class, ViewGroup.class, boolean.class, new XC_MethodHook() {
+                                    @Override
+                                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                                        inflateButtonN(param);
+                                    }
+                                });
+                    } catch (NoSuchMethodError e1) {
+                        XposedBridge.log("inflateButton not found");
+                        return;
+                    }
                 }
 
                 try {
@@ -1794,4 +1732,88 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                 + GRAVITY_SEPARATOR + KEY_RIGHT_MARGIN_N;
     }
 
+    void inflateButtonN(MethodHookParam param) {
+        if (mContext == null)
+            mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
+        SharedPreferences remotePref = new RemotePreferences(mContext, Utils.PREF_AUTHORITY, Utils.PREF_NAME);
+
+        String buttonSpec = (String) param.args[0];
+        ViewGroup parent = (ViewGroup) param.args[1];
+        boolean landscape = (boolean) param.args[2];
+
+        // theme settings
+        prepareForTheme(remotePref);
+
+        if (param.getResult() == null) {
+//                                        XposedBridge.log(String.format("buttonSpec:%s landscape:%b", buttonSpec, landscape));
+
+            Drawable drawable;
+            ImageView view;
+
+            if (KEY_SEARCH_N.equals(buttonSpec)) {
+                int keyCode = Integer.parseInt(remotePref.getString("pref_search_function", String.valueOf(KeyEvent.KEYCODE_SEARCH)));
+                int keyCodeLongPress = Integer.parseInt(remotePref.getString("pref_search_longpress_function", String.valueOf(KEYCODE_NONE)));
+                String funcApp = remotePref.getString("pref_search_function_apps", null);
+                String funcAppLongPress = remotePref.getString("pref_search_longpress_function_apps", null);
+                String funcShortcut = remotePref.getString("pref_search_function_shortcut", null);
+                String funcShortcutLongPress = remotePref.getString("pref_search_longpress_function_shortcut", null);
+
+                int layoutWidth = landscape ? LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT;
+                int layoutHeight = landscape ? LinearLayout.LayoutParams.WRAP_CONTENT : LinearLayout.LayoutParams.MATCH_PARENT;
+                drawable = getButtonDrawable(mThemeIcons, mCustomButtons, mUseTheme, mThemeId, mThemeColor, landscape, false, "Search");
+                view = createButtonView(mContext, null, layoutWidth, layoutHeight, null,
+                        drawable, keyCode, "search", RES_ID_SEARCH, true);
+
+                ((KeyButtonViewN) view).setCodeLongPress(keyCodeLongPress);
+                ((KeyButtonViewN) view).setFuncApp(funcApp);
+                ((KeyButtonViewN) view).setFuncAppLongPress(funcAppLongPress);
+                ((KeyButtonViewN) view).setFuncShortcut(funcShortcut);
+                ((KeyButtonViewN) view).setFuncShortcutLongPress(funcShortcutLongPress);
+
+//                                            XposedBridge.log(String.format("keyCode:%d, keyCodeLongPress:%d", keyCode, keyCodeLongPress));
+
+            } else if (KEY_SEPARATOR_N.equals(buttonSpec) || KEY_LEFT_MARGIN_N.equals(buttonSpec)
+                    || KEY_RIGHT_MARGIN_N.equals(buttonSpec) || KEY_LEFT_IME_PADDING_N.equals(buttonSpec)) {
+                int layoutWidth = landscape ? LinearLayout.LayoutParams.MATCH_PARENT : 1;
+                int layoutHeight = landscape ? 1 : LinearLayout.LayoutParams.MATCH_PARENT;
+                view = new ImageView(mContext);
+                view.setLayoutParams(new LinearLayout.LayoutParams(layoutWidth, layoutHeight, 0.0f));
+                view.setTag(buttonSpec);
+            } else {
+                param.setResult(null);
+                return;
+            }
+            parent.addView(view);
+
+            String lastLandFieldName;
+            String lastPortFieldName;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                lastLandFieldName = "mLastLandscape";
+                lastPortFieldName = "mLastPortrait";
+            } else {
+                lastLandFieldName = "mLastRot90";
+                lastPortFieldName = "mLastRot0";
+            }
+            if (landscape)
+                XposedHelpers.setObjectField(param.thisObject, lastLandFieldName, view);
+            else
+                XposedHelpers.setObjectField(param.thisObject, lastPortFieldName, view);
+        } else if (KEY_HOME_N.equals(buttonSpec) || KEY_MENU_N.equals(buttonSpec)
+                || KEY_BACK_N.equals(buttonSpec) || KEY_RECENT_N.equals(buttonSpec)) {
+            View view = (View) param.getResult();
+            if (mUseTheme) {
+                String key = nKey2OldKey(buttonSpec);
+                Drawable drawable = getButtonDrawable(mThemeIcons, mCustomButtons, mUseTheme, mThemeId, mThemeColor,
+                        landscape, KEY_MENU_N.equals(buttonSpec) && mUseAltMenu, key);
+                if (KEY_MENU_N.equals(buttonSpec)) {
+                    int menuId = mContext.getResources().getIdentifier("menu", "id", CLASSNAME_SYSTEMUI);
+                    for (int i = 0; i < ((FrameLayout) view).getChildCount(); i++)
+                        if (((FrameLayout) view).getChildAt(i).getId() == menuId)
+                            ((ImageView) ((FrameLayout) view).getChildAt(i)).setImageDrawable(drawable);
+                } else
+                    ((ImageView) view).setImageDrawable(drawable);
+            }
+            view.setTag(buttonSpec);
+        }
+    }
 }

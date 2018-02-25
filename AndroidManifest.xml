@@ -1,12 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gzplanet.xposed.xperianavbarbuttons"
-<<<<<<< HEAD
-    android:versionCode="60"
-    android:versionName="6.0 (build 10291526)" >
-=======
-    android:versionCode="53"
-    android:versionName="5.3 (build 12121415)" >
->>>>>>> origin/master
+    android:versionCode="61"
+    android:versionName="6.1 (build 02251809)" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -15,6 +10,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
     <uses-permission android:name="android.permission.REORDER_TASKS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -45,7 +42,7 @@
         </activity>
         
         <provider
-            android:authorities="com.gzplanet.app.preferences"
+            android:authorities="com.gzplanet.app.xperianavbarbuttons_preferences"
             android:name=".PreferenceProvider"
             android:exported="true"/>
 
@@ -58,6 +55,15 @@
         <meta-data
             android:name="xposeddescription"
             android:value="Modify NavBar buttons for Android devices" />
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
