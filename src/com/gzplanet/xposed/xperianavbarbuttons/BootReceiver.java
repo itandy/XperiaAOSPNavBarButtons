@@ -11,7 +11,7 @@ import android.util.Log;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (intent.getAction().equals(Intent.ACTION_LOCKED_BOOT_COMPLETED) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -19,6 +19,7 @@ public class BootReceiver extends BroadcastReceiver {
             intent2.setAction(XperiaNavBarButtons.ACTION_NAVBAR_CHANGED);
             intent2.putExtra("order_list", pref.getString("pref_order", XperiaNavBarButtons.DEF_BUTTONS_ORDER_LIST));
             intent2.putExtra("show_menu", pref.getBoolean("pref_show_menu", true));
+            intent2.putExtra("show_toast", true);
             context.sendBroadcast(intent2);
 
         }

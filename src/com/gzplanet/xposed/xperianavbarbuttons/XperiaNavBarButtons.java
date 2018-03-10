@@ -86,6 +86,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
 
     final static int NAVIGATION_HINT_IME_SHOWN = 1 << 1;
     final static String DEF_BUTTONS_ORDER_LIST = "Home,Menu,Recent,Back,Search";
+    final static String DEF_STOCK_BUTTONS_ORDER_LIST = "Back,Home,Recent";
 
     // Nougat settings
     final static String GRAVITY_SEPARATOR = ";";
@@ -137,6 +138,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
     static View mNavigationBarView;
     static View mNavigationBarInflaterView;
     static int mRotation;
+    static boolean mSystemBootCompleted = false;
 
     Map<String, Bitmap> mStockButtons = new HashMap<String, Bitmap>();
 
@@ -145,6 +147,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
         public void onReceive(Context context, Intent intent) {
             if (ACTION_NAVBAR_CHANGED.equals(intent.getAction())) {
                 if (intent.hasExtra("show_menu") && intent.hasExtra("show_menu") && mNavigationBarView != null) {
+                    mSystemBootCompleted = true;
+
                     String orderList = intent.getStringExtra("order_list");
                     boolean showMenu = intent.getBooleanExtra("show_menu", true);
                     boolean showToast = intent.getBooleanExtra("show_toast", false);
@@ -156,7 +160,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                         XposedHelpers.callMethod(mNavigationBarInflaterView, "clearViews");
                         XposedHelpers.callMethod(mNavigationBarInflaterView, "inflateLayout", getOrderListForN(orderList, showMenu));
                         if (showToast)
-                            Toast.makeText(context, "Changes applied", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Customized NavBar applied", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(context, "mNavigationBarInflaterView is NULL", Toast.LENGTH_SHORT).show();
                     }
@@ -1136,6 +1140,9 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                     XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARINFLATERVIEW, lpparam.classLoader, "getDefaultLayout", new XC_MethodReplacement() {
                         @Override
                         protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                            if (!mSystemBootCompleted)
+                                return getOrderListForN(DEF_STOCK_BUTTONS_ORDER_LIST, false);
+
                             if (mContext == null)
                                 mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
                             SharedPreferences remotePref = new RemotePreferences(mContext, Utils.PREF_AUTHORITY, Utils.PREF_NAME);
