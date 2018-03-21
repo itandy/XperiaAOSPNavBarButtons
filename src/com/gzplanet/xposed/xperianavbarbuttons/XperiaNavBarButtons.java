@@ -60,6 +60,8 @@ import de.robv.android.xposed.callbacks.XCallback;
 
 public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookInitPackageResources,
         IXposedHookLoadPackage {
+    final static String TAG = "AndroidNavBarButtons";
+
     final static String PKGNAME_SYSTEM_SERVICE = "android";
     final static String CLASSNAME_SYSTEMUI = "com.android.systemui";
     final static String CLASSNAME_NAVIGATIONBARVIEW = "com.android.systemui.statusbar.phone.NavigationBarView";
@@ -147,22 +149,25 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
         public void onReceive(Context context, Intent intent) {
             if (ACTION_NAVBAR_CHANGED.equals(intent.getAction())) {
                 if (intent.hasExtra("show_menu") && intent.hasExtra("show_menu") && mNavigationBarView != null) {
-                    mSystemBootCompleted = true;
+                    boolean fromBootReceiver = intent.getBooleanExtra("boot", false);
+                    if (!fromBootReceiver || fromBootReceiver && !mSystemBootCompleted) {
+                        mSystemBootCompleted = true;
 
-                    String orderList = intent.getStringExtra("order_list");
-                    boolean showMenu = intent.getBooleanExtra("show_menu", true);
-                    boolean showToast = intent.getBooleanExtra("show_toast", false);
+                        String orderList = intent.getStringExtra("order_list");
+                        boolean showMenu = intent.getBooleanExtra("show_menu", true);
+                        boolean showToast = intent.getBooleanExtra("show_toast", false);
 
-                    Configuration mConfiguration = (Configuration) XposedHelpers.getObjectField(mNavigationBarView, "mConfiguration");
-                    XposedHelpers.callMethod(mNavigationBarView, "updateIcons", context, Configuration.EMPTY, mConfiguration);
-                    XposedHelpers.callMethod(mNavigationBarView, "setMenuVisibility", showMenu, true);
-                    if (mNavigationBarInflaterView != null) {
-                        XposedHelpers.callMethod(mNavigationBarInflaterView, "clearViews");
-                        XposedHelpers.callMethod(mNavigationBarInflaterView, "inflateLayout", getOrderListForN(orderList, showMenu));
-                        if (showToast)
-                            Toast.makeText(context, "Customized NavBar applied", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "mNavigationBarInflaterView is NULL", Toast.LENGTH_SHORT).show();
+                        Configuration mConfiguration = (Configuration) XposedHelpers.getObjectField(mNavigationBarView, "mConfiguration");
+                        XposedHelpers.callMethod(mNavigationBarView, "updateIcons", context, Configuration.EMPTY, mConfiguration);
+                        XposedHelpers.callMethod(mNavigationBarView, "setMenuVisibility", showMenu, true);
+                        if (mNavigationBarInflaterView != null) {
+                            XposedHelpers.callMethod(mNavigationBarInflaterView, "clearViews");
+                            XposedHelpers.callMethod(mNavigationBarInflaterView, "inflateLayout", getOrderListForN(orderList, showMenu));
+                            if (showToast)
+                                Toast.makeText(context, "Customized NavBar applied", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "mNavigationBarInflaterView is NULL", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
@@ -191,7 +196,6 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
         // force navbar on Samsung devices
         try {
             XResources.setSystemWideReplacement("android", "bool", "config_showNavigationBar", true);
-            XposedBridge.log("Set config_showNavigationBar");
         } catch (Throwable t) {
             XposedBridge.log("Resource config_showNavigationBar not found");
         }
@@ -687,13 +691,13 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                         leftMargin = 0;
                         rightMargin = 0;
                     }
-                    XposedBridge.log(String
-                            .format("screenWidth:%d, screenWidthLand:%d, buttonWidth0:%d, buttonWidth90:%d, leftMargin:%d, rightMargin:%d, leftMargin90:%d, rightMargin90:%d, extraKeyWidth:%d, separatorWidthFactor:%d",
+                    XposedBridge.log(TAG + String
+                            .format(" screenWidth:%d, screenWidthLand:%d, buttonWidth0:%d, buttonWidth90:%d, leftMargin:%d, rightMargin:%d, leftMargin90:%d, rightMargin90:%d, extraKeyWidth:%d, separatorWidthFactor:%d",
                                     mScreenWidth, mScreenWidthLand, buttonWidth0, buttonWidth90, leftMargin, rightMargin,
                                     leftMargin90, rightMargin90, extraKeyWidth, separatorWidthFactor));
 
                     // write stock button images to cache folder
-                    XposedBridge.log(String.format("Stock button count:%d, ExternalCacheDir:%s", mStockButtons.size(),
+                    XposedBridge.log(TAG + String.format(" Stock button count:%d, ExternalCacheDir:%s", mStockButtons.size(),
                             mContext.getExternalCacheDir()));
                     try {
                         if (mStockButtons.size() > 0) {
@@ -1148,7 +1152,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                             SharedPreferences remotePref = new RemotePreferences(mContext, Utils.PREF_AUTHORITY, Utils.PREF_NAME);
                             boolean showMenu = remotePref.getBoolean("pref_show_menu", true);
                             String orderList = getOrderListForN(remotePref.getString("pref_order", DEF_BUTTONS_ORDER_LIST), showMenu);
-                            XposedBridge.log("orderList: " + orderList);
+//                            XposedBridge.log("orderList: " + orderList);
                             return orderList;
                         }
                     });
@@ -1161,6 +1165,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                     XposedHelpers.findAndHookMethod(CLASSNAME_NAVIGATIONBARINFLATERVIEW, lpparam.classLoader, "inflateLayout", String.class, new XC_MethodReplacement() {
                         @Override
                         protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+//                            XposedBridge.log("mSystemBootCompleted: " + mSystemBootCompleted);
+
                             if (mContext == null)
                                 mContext = (Context) XposedHelpers.getObjectField(param.thisObject, "mContext");
                             SharedPreferences remotePref = new RemotePreferences(mContext, Utils.PREF_AUTHORITY, Utils.PREF_NAME);
@@ -1205,8 +1211,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                                 rightMargin = 0;
                             }
 
-                            XposedBridge.log(String
-                                    .format("rotation:%d, screenWidth:%d, screenWidthLand:%d, leftMargin:%d, rightMargin:%d, leftMarginLand:%d, rightMarginLand:%d, separatorWidthFactor:%d, imePadding:%d",
+                            XposedBridge.log(TAG + String
+                                    .format(" rotation:%d, screenWidth:%d, screenWidthLand:%d, leftMargin:%d, rightMargin:%d, leftMarginLand:%d, rightMarginLand:%d, separatorWidthFactor:%d, imePadding:%d",
                                             mRotation, mScreenWidth, mScreenWidthLand, leftMargin, rightMargin,
                                             leftMarginLand, rightMarginLand, separatorWidthFactor, imePadding));
 
@@ -1391,7 +1397,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                                     SharedPreferences remotePref = new RemotePreferences(context, Utils.PREF_AUTHORITY, Utils.PREF_NAME);
                                     mUseTheme = remotePref.getBoolean("pref_usetheme", false);
 
-                                    if (mUseTheme) {
+                                    if (mUseTheme && mSystemBootCompleted) {
                                         // theme settings
                                         prepareForTheme(remotePref);
 
@@ -1728,6 +1734,8 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
         mCacheFolder = remotePref.getString("pref_cache_folder", null);
         mDensityDpi = remotePref.getInt("pref_density_dpi", -1);
 
+//        XposedBridge.log(String.format("mUseTheme:%b mThemeId:%s", mUseTheme, mThemeId));
+
         if (mCacheFolder != null && mDensityDpi > 0)
             mCustomButtons = new CustomButtons(mCacheFolder, mDensityDpi, CustomButtons.FILENAME_PREFIX);
     }
@@ -1764,6 +1772,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
                 String funcAppLongPress = remotePref.getString("pref_search_longpress_function_apps", null);
                 String funcShortcut = remotePref.getString("pref_search_function_shortcut", null);
                 String funcShortcutLongPress = remotePref.getString("pref_search_longpress_function_shortcut", null);
+//                XposedBridge.log(String.format("keyCode:%d keyCodeLongPress:%d", keyCode, keyCodeLongPress));
 
                 int layoutWidth = landscape ? LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT;
                 int layoutHeight = landscape ? LinearLayout.LayoutParams.WRAP_CONTENT : LinearLayout.LayoutParams.MATCH_PARENT;
@@ -1808,7 +1817,7 @@ public class XperiaNavBarButtons implements IXposedHookZygoteInit, IXposedHookIn
         } else if (KEY_HOME_N.equals(buttonSpec) || KEY_MENU_N.equals(buttonSpec)
                 || KEY_BACK_N.equals(buttonSpec) || KEY_RECENT_N.equals(buttonSpec)) {
             View view = (View) param.getResult();
-            if (mUseTheme) {
+            if (mUseTheme && mSystemBootCompleted) {
                 String key = nKey2OldKey(buttonSpec);
                 Drawable drawable = getButtonDrawable(mThemeIcons, mCustomButtons, mUseTheme, mThemeId, mThemeColor,
                         landscape, KEY_MENU_N.equals(buttonSpec) && mUseAltMenu, key);
